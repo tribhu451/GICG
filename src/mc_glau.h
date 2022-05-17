@@ -148,10 +148,13 @@ void set_mc_glau_params()
   else {cout<<"target not recognized, it's : "<<InData->target<<endl; exit(1);}
   
   // collision energy
-  if(InData->SNN == 200.0){sigma =4.2;}
-  else if(InData->SNN == 62.4){sigma =3.155;}
-  else if(InData->SNN == 2760.0){sigma =6.4;}
-  else if(InData->SNN == 5500.0){sigma =7.2;}
+
+  if      (InData->SNN == 200.0 )  {  sigma =4.20;   }
+  else if (InData->SNN == 130.0 )  {  sigma =4.00;   }
+  else if (InData->SNN == 62.4  )  {  sigma =3.56;   }
+  else if (InData->SNN == 19.6  )  {  sigma =3.23;   }
+  else if (InData->SNN == 2760.0)  {  sigma =6.40;   }
+  else if (InData->SNN == 5500.0)  {  sigma =7.20;   }
   else{cout<<"SNN(energy) not recognised"<<endl; exit(1);}
   
   // impact parameter range
