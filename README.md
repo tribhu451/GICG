@@ -1,4 +1,4 @@
-   Glauber-type Initial Condition generator ver 0.0.0.1
+   (GICG) Glauber-type Initial Condition Generator ver 0.0.0.1
    ====================================================
    
    Tribhuban Parida, Research Scholar, IISER Berhampur
