@@ -39,6 +39,8 @@ void read_input_data_(InputData *input_parameter_list, string input_file_name)
       iss = new istringstream(buff);
       *iss >> a_ >> a ;
  
+      if(a_ == "mode" )    {input_parameter_list->mode = atof(a);}
+
       if(a_ == "projectile" )    {input_parameter_list->projectile = a;}
       if(a_ == "target" )    {input_parameter_list->target = a;}
       if(a_ == "SNN" )    {input_parameter_list->SNN = atof(a);}
@@ -70,9 +72,17 @@ void read_input_data_(InputData *input_parameter_list, string input_file_name)
       if(a_ == "matter_eta_fall" ) {input_parameter_list->matter_eta_fall = atof(a);} 
       if(a_ == "matter_tilt_param" ) {input_parameter_list->matter_tilt_param = atof(a);} 
 
+      if(a_ == "baryon_rapidity_profile_type" ) {input_parameter_list->baryon_rapidity_profile_type = atof(a);} 
+      if(a_ == "two_component_baryon_deposition_parameter_omega" ) {input_parameter_list->two_component_baryon_deposition_parameter_omega = atof(a);} 
+
       if(a_ == "baryon_rapidity_profile_eta_peak" ) {input_parameter_list->baryon_rapidity_profile_eta_peak = atof(a);} 
       if(a_ == "baryon_rapidity_profile_sigma_eta_plus" ) {input_parameter_list->baryon_rapidity_profile_sigma_eta_plus = atof(a);} 
       if(a_ == "baryon_rapidity_profile_sigma_eta_minus" ) {input_parameter_list->baryon_rapidity_profile_sigma_eta_minus = atof(a);} 
+
+      if(a_ == "iiserbpr_ra_type_2_peak" ) {input_parameter_list->iiserbpr_ra_type_2_peak = atof(a);} 
+      if(a_ == "iiserbpr_ra_type_2_etal" ) {input_parameter_list->iiserbpr_ra_type_2_etal = atof(a);} 
+      if(a_ == "iiserbpr_ra_type_2_right_fall" ) {input_parameter_list->iiserbpr_ra_type_2_right_fall = atof(a);} 
+
 
       delete iss;
       number++;

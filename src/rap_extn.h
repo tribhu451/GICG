@@ -26,6 +26,9 @@ class rapidity_extension{
         ~rapidity_extension();
         void write_rapidity_extended_tilted_profile_from_idnni_boost_invariant_deposition
                   (int flag_for_baryon, int flag_for_reading_external_file, std::string external_file_name );
+        void write_rapidity_extended_tilted_profile_from_mc_glauber_boost_invariant_deposition
+                  (int flag_for_baryon, int flag_for_reading_external_file, std::string external_file_name );
+
 
     private :
         InputData *iparams;
@@ -33,9 +36,14 @@ class rapidity_extension{
         char   buff[400];
         double rapidity_asymmetry_ansatz_for_tilt_by_Bozek(double etas, double etam);
         int theta(double );
-        double baryon_density_eta_envelop_profile(double eta, double eta0_nb, double sigma_eta_nb_plus, double sigma_eta_nb_minus ) ; 
-        double baryon_density_eta_envelop_profile_function(double* x, double* p) ; 
-        double integrate_baryon_density_eta_envelop_profile_over_eta() ; 
+        double baryon_density_eta_envelop_profile_arxiv_1804_10557(double eta, double eta0_nb, double sigma_eta_nb_plus, double sigma_eta_nb_minus ) ; 
+        double baryon_density_eta_envelop_profile_arxiv_1804_10557_function(double* x, double* p) ; 
+        double integrate_baryon_density_eta_envelop_profile_arxiv_1804_10557_over_eta() ;
+
+        // IISER Berhampur baryon rapidity ansatz-2 //
+        double baryon_density_eta_envelop_profile_iiserbpr_type_2(double eta, double eta_0, double eta_L, double sig);
+        double baryon_density_eta_envelop_profile_iiserbpr_type_2_function(double* x, double* p);
+        double integrate_baryon_density_eta_envelop_profile_iiserbpr_type_2_over_eta();
 
 };
 

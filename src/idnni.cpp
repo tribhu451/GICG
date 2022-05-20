@@ -280,59 +280,6 @@ void idnni::update_contribution_on_cells_over_all_events(){
   }
 }
 
-// Write the event averaged profile in MUSIC format.
-void idnni::write_event_averaged_profile_to_file(int nEvents, int flag_to_generate_music_boost_invariant_file){
-  
-  std::ofstream out_file;
-  if(flag_to_generate_music_boost_invariant_file > 0 ){
-    out_file.open("output/event_averaged_profile_for_boost_invariant_music.dat", std::ios::out);
-    cout << "the output file could be directly used in boost invariant music ... " << endl ; 
-  }
-  else{
-    out_file.open("output/idnni_boost_invariant_event_averaged_profile_for_rapidity_extension.dat", std::ios::out);
-  }
-
-  out_file<<"#"<<"\t"<<"event_avergaed_glauber"<<"\t"<<"1"<<"\t"<<"neta="<<"\t"<<"1"<<"\t"<<"nx="<<"\t"<<nx<<"\t"<<"ny="<<"\t"<<ny
-	  <<"\t"<<"deta="<<"\t"<<"0.1"<<"\t"<<"dx="<<"\t"<<dx<<"\t"<<"dy="<<"\t"<<dy<<endl;
-  
-  double mult   = 0.0 ;
-  double mult_a = 0.0 ;
-  double mult_b = 0.0 ;
-  for(int ix = 0 ; ix < nx ; ix++ ){
-    for(int iy = 0 ; iy < ny ; iy++ ){
-      double grid_x = -x_max + ix * dx ; 
-      double grid_y = -y_max + iy * dy ;
-      if( arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_over_all_events() > 0.000001 && 
-	  arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_over_all_events() > 0.000001 ){
-	mult = arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_over_all_events() +
-	  arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_over_all_events() ; 
-        mult_a = arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_after_gaussian_smearing_over_all_events() ; 
-        mult_b = arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_after_gaussian_smearing_over_all_events() ; 
-      }
-      else{
-	mult   = 0.00000001 ; 
-	mult_a = 0.00000001 ; 
-	mult_b = 0.00000001 ; 
-      }
-
-      if(flag_to_generate_music_boost_invariant_file  > 0 ){ 
-        out_file << "0" << "\t" << grid_x << "\t" << grid_y << "\t" << mult / nEvents  
-               << "\t" << "1" << "\t" << "0" << "\t" << "0" << "\t" << "0"
-               << "\t" << "0" << "\t" << "0" << "\t" << "0" << endl ;
-      }
-      else{
-      out_file << "0" << "\t" << grid_x << "\t" << grid_y << "\t" << mult / nEvents << "\t" << mult_a / nEvents << "\t" << mult_b / nEvents 
-               << "\t" << "1" << "\t" << "0" << "\t" << "0" << "\t" << "0"
-               << "\t" << "0" << "\t" << "0" << "\t" << "0" << endl ;
-      }
-      
-    }
-  }
-}
-
-
-
-
 
 
 // * * * * * * * * * * * * * * * * * * * * * *
@@ -502,8 +449,8 @@ double idnni::get_total_deposition_over_all_cells_after_gaussian_smearing_for_cu
 
 void idnni::get_eccentricities_and_participant_plane_angles_after_gaussian_smearing(int Norder, double* eps, double* psi){
   for(int iorder = 0 ; iorder < Norder ; iorder++ ){
-    eps[iorder] = 0. ; 
-    psi[iorder] = 0. ; 
+    eps[iorder]  = 0. ; 
+    psi[iorder]  = 0. ; 
   }
   
   double cosnphi[Norder] ;  // represents <cos(n*phi)>
@@ -566,7 +513,7 @@ void idnni::write_event_averaged_profile_to_file_after_gaussian_smearing(int nEv
   
   std::ofstream out_file;
   if(flag_to_generate_music_boost_invariant_file > 0 ){
-    out_file.open("output/event_averaged_profile_for_boost_invariant_music.dat", std::ios::out);
+    out_file.open("output/idnni_event_averaged_profile_for_boost_invariant_music.dat", std::ios::out);
     cout << "the output file could be directly used in boost invariant music ... " << endl ; 
   }
   else{
@@ -586,12 +533,12 @@ void idnni::write_event_averaged_profile_to_file_after_gaussian_smearing(int nEv
     for(int iy = 0 ; iy < ny ; iy++ ){
       double grid_x = -x_max + ix * dx ; 
       double grid_y = -y_max + iy * dy ;
-      if( arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_after_gaussian_smearing_over_all_events() > 0.000001 && 
-	  arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_after_gaussian_smearing_over_all_events() > 0.000001 ){
-	mult = arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_after_gaussian_smearing_over_all_events() +
-	  arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_after_gaussian_smearing_over_all_events() ; 
-        mult_a = arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_after_gaussian_smearing_over_all_events() ; 
-        mult_b = arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_after_gaussian_smearing_over_all_events() ; 
+      if( arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_over_all_events() > 0.000001 && 
+	  arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_over_all_events() > 0.000001 ){
+	mult = arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_over_all_events() +
+	  arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_over_all_events() ; 
+        mult_a = arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_over_all_events() ; 
+        mult_b = arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_over_all_events() ; 
       }
       else{
 	mult   = 0.000000002 ; 

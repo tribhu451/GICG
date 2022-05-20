@@ -18,7 +18,7 @@ LIBS          = $(ROOTLIBS) $(SYSLIBS) $(GSLLIBS)
 vpath %.cpp src
 objdir     = obj
 
-SRC        = main.cpp job.cpp grid.cpp  mc_glau.cpp idnni.cpp cell.cpp rap_extn.cpp
+SRC        = main.cpp job.cpp grid.cpp  mc_glau.cpp idnni.cpp cell.cpp rap_extn.cpp mc_glau_smear.cpp
              
 OBJS       = $(patsubst %.cpp,$(objdir)/%.o,$(SRC)) 
               

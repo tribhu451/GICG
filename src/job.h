@@ -14,6 +14,7 @@
 #include "cell.h"
 #include "grid.h"
 #include "idnni.h"
+#include "mc_glau_smear.h"
 
 #define PI  3.1415927
 
@@ -25,7 +26,7 @@ using std::to_string;
 class job{
 
 public :
- job(InputData* , grid* , mc_glau* , idnni* );
+ job(InputData* , grid* , mc_glau* );
  ~job();
 
  void event_by_event_mc_glauber_for_centrality_determination(int );
@@ -35,11 +36,29 @@ public :
  void event_by_event_idnni_and_eccentricity_calculation(int );
 
  void rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_idnni(int );
+ void rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_mc_glauber(int );
 
 private :
-idnni* IDNNI ; 
-mc_glau* MC ; 
-InputData *iparams ;
-grid* arena ; 
+ idnni* IDNNI ; 
+ mc_glau* MC ; 
+ InputData *iparams ;
+ grid* arena ; 
+ mc_glau_smear* MCGlbS ; 
+
+
 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+

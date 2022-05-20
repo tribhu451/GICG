@@ -32,10 +32,15 @@ class mc_glau
   ~mc_glau();
   void event(int flag_for_centrality_calculation );
   inline int get_npart(){return NPART;}
+  inline int get_no_of_participants_in_nucleus_a(){return Nparticipants_from_A;}
+  inline int get_no_of_participants_in_nucleus_b(){return Nparticipants_from_B;}
   inline int get_ncoll(){return NCOLL;}
+  inline double get_two_component_galuber_multiplicity_proxy(){
+    return  InData->npp * 0.5 * get_npart()* ( 1.0 - InData->xhard ) +  InData->npp * InData->xhard * get_ncoll() ; 
+  }
   inline double get_impactf(){return IMPACT_PARAM;}
-  void calculate_eccentricity(int aN_part,int aN_coll,double *Npart_x,
-                     double *Npart_y,double *Ncoll_x,double *Ncoll_y);
+  void calculate_eccentricity(int Norder, int aN_part,int aN_coll,double *Npart_x,
+                     double *Npart_y,double *Ncoll_x,double *Ncoll_y, double* eps, double* psi);
 
   void get_nucleus_A(double *X1, double *Y1, double* Z1);
   void get_nucleus_B(double *X2, double *Y2, double* Z2);
@@ -60,6 +65,38 @@ class mc_glau
   inline double phi5(){return PhiN[5];}
   inline double eccen6(){return eccentricity[6];}
   inline double phi6(){return PhiN[6];}
+
+  inline void get_npart_source_positions(double *xx, double* yy){
+    for(int ii=0; ii<500; ii++){
+      xx[ii] = npart_x[ii] ; 
+      yy[ii] = npart_y[ii] ; 
+    }
+  }
+
+  inline void get_ncoll_source_positions(double *xx, double* yy){
+    for(int ii=0; ii<10000; ii++){
+      xx[ii] = ncoll_x[ii] ; 
+      yy[ii] = ncoll_y[ii] ; 
+    }
+  }
+
+
+  inline void get_npart_source_positions_of_nucleus_a(double *xx, double* yy){
+    for(int ii=0; ii<500; ii++){
+      xx[ii] = npart_x_of_A[ii] ; 
+      yy[ii] = npart_y_of_A[ii] ; 
+    }
+  }
+
+
+  inline void get_npart_source_positions_of_nucleus_b(double *xx, double* yy){
+    for(int ii=0; ii<500; ii++){
+      xx[ii] = npart_x_of_B[ii] ; 
+      yy[ii] = npart_y_of_B[ii] ; 
+    }
+  }
+
+
 
  
  private:
@@ -86,6 +123,10 @@ class mc_glau
   int NCOLL;
   double IMPACT_PARAM;
 
+// individual contribution
+  int Nparticipants_from_A ; 
+  int Nparticipants_from_B ; 
+
 // two-component energy deposition
   double npp;
   double X_hard;
@@ -108,6 +149,11 @@ class mc_glau
   double XB[300];double YB[300];double ZB[300];
   double npart_x[500],npart_y[500];
   double ncoll_x[10000],ncoll_y[10000];
+
+  
+  // individual contribution
+  double npart_x_of_A[500],npart_y_of_A[500];
+  double npart_x_of_B[500],npart_y_of_B[500];
 
 
   void generate_nucleus(double* X1, double* Y1,double* Z1,int A,

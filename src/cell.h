@@ -23,7 +23,7 @@ class cell{
   iy = iiy;
  }
 
-  // below functions are for each event calculation.
+  // below functions are for each event calculationin IDNNI.
   inline void set_contri_from_nucleus_a(int xx){ contri_from_nucleus_a = xx ;}
   inline void set_contri_from_nucleus_b(int xx){ contri_from_nucleus_b = xx ;}
 
@@ -35,6 +35,24 @@ class cell{
   inline void update_contri_from_nucleus_b(double xx){ contri_from_nucleus_b += xx;}
   
 
+  // below functions are for gaussian smearing in 'each' event.  // NOTE : "each event."
+  // event by event, one has to set the contribution inorder to start from fresh.  
+  inline void set_contri_from_nucleus_a_after_gaussian_smearing(int xx){ contri_from_nucleus_a_after_gaussian_smearing = xx ;}
+  inline void set_contri_from_nucleus_b_after_gaussian_smearing(int xx){ contri_from_nucleus_b_after_gaussian_smearing = xx ;}
+  inline void set_contri_from_binary_collisions_after_gaussian_smearing(int xx){ contri_from_binary_collisions_after_gaussian_smearing = xx ;}
+
+  inline double get_contri_from_nucleus_a_after_gaussian_smearing(){return contri_from_nucleus_a_after_gaussian_smearing;}
+  inline double get_contri_from_nucleus_b_after_gaussian_smearing(){return contri_from_nucleus_b_after_gaussian_smearing;}
+  inline double get_contri_from_binary_collisions_after_gaussian_smearing(){return contri_from_binary_collisions_after_gaussian_smearing;}
+  inline double get_net_deposition_on_the_cell_after_gaussian_smearing(){
+     return (contri_from_nucleus_a_after_gaussian_smearing+contri_from_nucleus_b_after_gaussian_smearing+contri_from_binary_collisions_after_gaussian_smearing);
+  }
+
+  inline void update_contri_from_nucleus_a_after_gaussian_smearing(double xx){ contri_from_nucleus_a_after_gaussian_smearing += xx;}
+  inline void update_contri_from_nucleus_b_after_gaussian_smearing(double xx){ contri_from_nucleus_b_after_gaussian_smearing += xx;}
+  inline void update_contri_from_binary_collisions_after_gaussian_smearing(double xx){ contri_from_binary_collisions_after_gaussian_smearing += xx;}
+
+
   // below functions are for event averaged profile.
   inline void update_contribution_from_nucleus_a_over_all_events(double xx){
     contri_from_nucleus_a_over_all_events += xx;
@@ -42,6 +60,10 @@ class cell{
 
   inline void update_contribution_from_nucleus_b_over_all_events(double xx){
     contri_from_nucleus_b_over_all_events += xx;
+  }
+
+  inline void update_contribution_from_binary_collisions_over_all_events(double xx){
+    contri_from_binary_collisions_over_all_events += xx;
   }
 
 
@@ -53,35 +75,8 @@ class cell{
     return contri_from_nucleus_b_over_all_events  ;
   }
 
-
-  // below functions are for gaussian smearing in each event.
-  inline void set_contri_from_nucleus_a_after_gaussian_smearing(int xx){ contri_from_nucleus_a_after_gaussian_smearing = xx ;}
-  inline void set_contri_from_nucleus_b_after_gaussian_smearing(int xx){ contri_from_nucleus_b_after_gaussian_smearing = xx ;}
-
-  inline double get_contri_from_nucleus_a_after_gaussian_smearing(){return contri_from_nucleus_a_after_gaussian_smearing;}
-  inline double get_contri_from_nucleus_b_after_gaussian_smearing(){return contri_from_nucleus_b_after_gaussian_smearing;}
-  inline double get_net_deposition_on_the_cell_after_gaussian_smearing(){
-     return (contri_from_nucleus_a_after_gaussian_smearing+contri_from_nucleus_b_after_gaussian_smearing);
-  }
-
-  inline void update_contri_from_nucleus_a_after_gaussian_smearing(double xx){ contri_from_nucleus_a_after_gaussian_smearing += xx;}
-  inline void update_contri_from_nucleus_b_after_gaussian_smearing(double xx){ contri_from_nucleus_b_after_gaussian_smearing += xx;}
-
-  inline void update_contribution_from_nucleus_a_after_gaussian_smearing_over_all_events(double xx){
-    contri_from_nucleus_a_over_all_events += xx;
-  }
-
-  inline void update_contribution_from_nucleus_b_after_gaussian_smearing_over_all_events(double xx){
-    contri_from_nucleus_b_over_all_events += xx;
-  }
-
-
-  inline double get_contribution_from_nucleus_a_after_gaussian_smearing_over_all_events(){
-    return contri_from_nucleus_a_over_all_events ;
-  }
-
-  inline double get_contribution_from_nucleus_b_after_gaussian_smearing_over_all_events(){
-    return contri_from_nucleus_b_over_all_events  ;
+  inline double get_contribution_from_binary_collisions_over_all_events(){
+    return contri_from_binary_collisions_over_all_events  ;
   }
 
 
@@ -92,16 +87,22 @@ class cell{
    int ix, iy;            // cell coordinate on the grid
 
    // contribution from nucleus A and Nucleus B.
+   // Below to variables are to be used in IDNNI only.
    double  contri_from_nucleus_a;
    double  contri_from_nucleus_b;
 
-   // below variables are for event averaged profile.
-   double  contri_from_nucleus_a_over_all_events ; 
-   double  contri_from_nucleus_b_over_all_events ; 
 
-   // below variables for gaussian smearing
+   // below variables for gaussian smearing in each event.
    double  contri_from_nucleus_a_after_gaussian_smearing;
    double  contri_from_nucleus_b_after_gaussian_smearing;
+   double  contri_from_binary_collisions_after_gaussian_smearing; // only required for 2 component MC Glauber. 
+
+
+   // below variables are for event averaged profile.
+   double  contri_from_nucleus_a_over_all_events ; 
+   double  contri_from_nucleus_b_over_all_events ;
+   double  contri_from_binary_collisions_over_all_events ; 
+
 
 
 
