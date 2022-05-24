@@ -36,7 +36,9 @@ typedef struct input_data
   int    neta;
   double matter_eta_plateau;
   double matter_eta_fall;
-  double matter_tilt_param;
+  double matter_tilt_param ;
+  double SARJ_model_f_param ; 
+  double init_time_tau0 ; 
  
   int     baryon_rapidity_profile_type ;
   double  two_component_baryon_deposition_parameter_omega ; 

@@ -45,6 +45,8 @@ neta   81
 matter_eta_plateau 1.3
 matter_eta_fall  1.5
 matter_tilt_param  2.5
+SARJ_model_f_param 0.25
+init_time_tau0 0.8 
 
 baryon_rapidity_profile_type 2
 

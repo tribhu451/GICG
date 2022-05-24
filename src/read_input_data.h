@@ -71,6 +71,8 @@ void read_input_data_(InputData *input_parameter_list, string input_file_name)
       if(a_ == "matter_eta_plateau" ) {input_parameter_list->matter_eta_plateau = atof(a);} 
       if(a_ == "matter_eta_fall" ) {input_parameter_list->matter_eta_fall = atof(a);} 
       if(a_ == "matter_tilt_param" ) {input_parameter_list->matter_tilt_param = atof(a);} 
+      if(a_ == "SARJ_model_f_param" ) {input_parameter_list->SARJ_model_f_param = atof(a);} 
+      if(a_ == "init_time_tau0" ) {input_parameter_list->init_time_tau0 = atof(a);} 
 
       if(a_ == "baryon_rapidity_profile_type" ) {input_parameter_list->baryon_rapidity_profile_type = atof(a);} 
       if(a_ == "two_component_baryon_deposition_parameter_omega" ) {input_parameter_list->two_component_baryon_deposition_parameter_omega = atof(a);} 
