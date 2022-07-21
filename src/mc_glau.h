@@ -193,15 +193,26 @@ void set_mc_glau_params()
   else if(InData->target == "U2"){B =238;  t_radius = 6.86; t_dlt=0.42; t_beta2 = 0.0; t_beta4 =0.0;}
   else {cout<<"target not recognized, it's : "<<InData->target<<endl; exit(1);}
   
-  // collision energy
 
-  if      (InData->SNN == 200.0 )  {  sigma =4.20;   }
-  else if (InData->SNN == 130.0 )  {  sigma =4.00;   }
-  else if (InData->SNN == 62.4  )  {  sigma =3.56;   }
-  else if (InData->SNN == 19.6  )  {  sigma =3.23;   }
-  else if (InData->SNN == 2760.0)  {  sigma =6.40;   }
-  else if (InData->SNN == 5500.0)  {  sigma =7.20;   }
-  else{cout<<"SNN(energy) not recognised"<<endl; exit(1);}
+  // collision energy and inelastic cross-section
+  if (InData->SNN > 5.0 ){
+    //  https://arxiv.org/pdf/1901.04484.pdf ( Equation-4 )  //
+    double ecm = InData->SNN ; 
+    double sigma_NN_inel  = 40.32 * pow( ecm + 53.08, 0.104) - 30.15 - 8.75 / ecm ; 
+    sigma = (sigma_NN_inel*0.1) ;
+  }
+  //  https://arxiv.org/pdf/1712.05815.pdf (Table 4.2 page-106)  //
+  //  https://arxiv.org/pdf/nucl-ex/0701025.pdf (caption of figure-2)  //
+  if (InData->SNN == 200.0 )  {  sigma =4.20;   }
+  if (InData->SNN == 130.0 )  {  sigma =4.00;   }
+  if (InData->SNN == 62.4  )  {  sigma =3.56;   }
+  if (InData->SNN == 19.6  )  {  sigma =3.23;   }
+  if (InData->SNN == 2760.0)  {  sigma =6.40;   }
+  if (InData->SNN == 5500.0)  {  sigma =7.20;   }
+  if (InData->SNN < 5.0 ){ 
+     cout<<"Glauber inelastic crossection not available ..."<<endl; 
+     exit(1);
+  }
   
   // impact parameter range
   bmin = InData->bmin; bmax = InData->bmax;
