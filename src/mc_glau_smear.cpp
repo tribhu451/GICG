@@ -282,6 +282,7 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
       participant_diff += (mult_a - mult_b) ;  
       
       if(flag_to_generate_music_boost_invariant_file  > 0 ){ 
+        mult /= (arena->get_dx()*arena->get_dy()) ; 
         out_file << "0" << "\t" << grid_x << "\t" << grid_y << "\t" << mult   
                  << "\t" << "1" << "\t" << "0" << "\t" << "0" << "\t" << "0"
                  << "\t" << "0" << "\t" << "0" << "\t" << "0" << endl ;

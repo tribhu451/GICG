@@ -307,23 +307,24 @@ void rapidity_extension::write_rapidity_extended_tilted_profile_from_mc_glauber_
   double baryon_envelope_b            = 0. ;  
   double net_deposited_baryon         = 0. ;
 
-  if(iparams->baryon_rapidity_profile_type == 1 ){
-    double baryon_weight_temp = ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * ( npart_of_a + npart_of_b ) +
-                                                    iparams->two_component_baryon_deposition_parameter_omega * 2 * ncoll_of_ab ; // 2 should be here. 
-    baryon_profile_normalisation = ( npart_of_a + npart_of_b ) 
-                                 / ( integrate_baryon_density_eta_envelop_profile_arxiv_1804_10557_over_eta() * baryon_weight_temp ) ;
+  if(flag_nb > 0){
+    if(iparams->baryon_rapidity_profile_type == 1 ){
+      double baryon_weight_temp = ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * ( npart_of_a + npart_of_b ) +
+                                                      iparams->two_component_baryon_deposition_parameter_omega * 2 * ncoll_of_ab ; // 2 should be here. 
+      baryon_profile_normalisation = ( npart_of_a + npart_of_b ) 
+                                   / ( integrate_baryon_density_eta_envelop_profile_arxiv_1804_10557_over_eta() * baryon_weight_temp ) ;
+    }
+    else if(iparams->baryon_rapidity_profile_type == 2){
+      double baryon_weight_temp = ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * ( npart_of_a + npart_of_b ) +
+                                                      iparams->two_component_baryon_deposition_parameter_omega * 2 * ncoll_of_ab ; // 2 should be here. 
+      baryon_profile_normalisation = ( npart_of_a + npart_of_b ) 
+                                   / ( integrate_baryon_density_eta_envelop_profile_iiserbpr_type_2_over_eta() * baryon_weight_temp ) ;
+    }
+    else{
+       std::cout << "Baryon rapidity profile type " << iparams->baryon_rapidity_profile_type << " doesn't exist." << std::endl ; 
+       exit(1);
+    }
   }
-  else if(iparams->baryon_rapidity_profile_type == 2){
-    double baryon_weight_temp = ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * ( npart_of_a + npart_of_b ) +
-                                                    iparams->two_component_baryon_deposition_parameter_omega * 2 * ncoll_of_ab ; // 2 should be here. 
-    baryon_profile_normalisation = ( npart_of_a + npart_of_b ) 
-                                 / ( integrate_baryon_density_eta_envelop_profile_iiserbpr_type_2_over_eta() * baryon_weight_temp ) ;
-  }
-  else{
-     std::cout << "Baryon rapidity profile type " << iparams->baryon_rapidity_profile_type << " doesn't exist." << std::endl ; 
-     exit(1);
-  }
-
 
   std::ofstream outfile;
   outfile.open("output/3D_initial_profile_for_music_from_mc_glauber.dat", std::ios::out);
