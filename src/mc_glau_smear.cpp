@@ -214,13 +214,26 @@ void mc_glau_smear::update_contribution_on_cells_over_all_events_with_gaussian_s
 }
 
 
+// relevant to generate Event-by-Event MC Glauber IC for hydro input. //
+void mc_glau_smear::reset_contribution_from_all_events_to_zero_on_the_cells(){
+  for(int ix = 0 ; ix < arena->get_nx() ; ix++ ){
+    for(int iy = 0 ; iy < arena->get_ny() ; iy++ ){
+      arena->get_cell(ix,iy)->reset_contributions_to_zero();
+    }
+  }
+}
+
 
 // Write the event averaged profile in MUSIC format.
-void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing(int nEvents, int flag_to_generate_music_boost_invariant_file){
+void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing(int nEvents, int flag_to_generate_music_boost_invariant_file, int event_index){
   
   std::ofstream out_file;
   if(flag_to_generate_music_boost_invariant_file > 0 ){
-    out_file.open("output/mc_glauber_event_averaged_profile_for_boost_invariant_music.dat", std::ios::out);
+    std::stringstream output_filename;
+    output_filename.str("");
+    output_filename << "output/mc_glauber_event_averaged_profile_for_boost_invariant_music_" << event_index ;
+    output_filename << ".dat";
+    out_file.open(output_filename.str().c_str(), std::ios::out);
     // cout << "the output file could be directly used in boost invariant music ... " << endl ; 
   }
   else{

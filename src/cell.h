@@ -80,6 +80,7 @@ class cell{
   }
 
 
+  void reset_contributions_to_zero();
 
 
  private :

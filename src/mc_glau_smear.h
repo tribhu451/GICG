@@ -14,7 +14,8 @@ class mc_glau_smear {
     ~mc_glau_smear();
     void smear_it(double );
     void update_contribution_on_cells_over_all_events_with_gaussian_smearing();
-    void write_event_averaged_profile_to_file_after_gaussian_smearing(int nEvents, int flag_to_generate_music_boost_invariant_file);
+    void write_event_averaged_profile_to_file_after_gaussian_smearing(int nEvents, int flag_to_generate_music_boost_invariant_file, int event_index);
+    void reset_contribution_from_all_events_to_zero_on_the_cells();
 
   private :
     mc_glau* mc;

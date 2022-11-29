@@ -38,6 +38,8 @@ public :
  void rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_idnni(int );
  void rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_mc_glauber(int );
 
+ void rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_ebe_mc_glauber_events(int event_no);
+
 private :
  idnni* IDNNI ; 
  mc_glau* MC ; 

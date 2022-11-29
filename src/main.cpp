@@ -56,8 +56,10 @@ int main(int argc, char **argv)
   //JOB->event_by_event_idnni_and_eccentricity_calculation(event_no);
   //JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_idnni(event_no);
   //RE ->write_rapidity_extended_tilted_profile_from_idnni_boost_invariant_deposition(0,0,"xx"); // nb flag, external file flag, external file name ;
-    JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_mc_glauber(event_no); 
-    RE ->write_rapidity_extended_tilted_profile_from_mc_glauber_boost_invariant_deposition(1,0,"xx"); // nb flag, external file flag, external file name ;
+  //JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_mc_glauber(event_no); 
+  //RE ->write_rapidity_extended_tilted_profile_from_mc_glauber_boost_invariant_deposition(1,0,"xx"); // nb flag, external file flag, external file name ;
+
+  JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_ebe_mc_glauber_events(event_no);
 
   delete MC ;
   delete arena ;
