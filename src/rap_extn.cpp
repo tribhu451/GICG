@@ -439,6 +439,9 @@ void rapidity_extension::write_rapidity_extended_energy_momentum_conserving_SARJ
   double dx ; 
   double dy ; 
 
+  std::cout << "eta_plateau = " << eta_plateau << std::endl ; 
+  std::cout << "eta_fall    = " << eta_fall << std::endl ; 
+  std::cout << "f           = " << f << std::endl ; 
  
   std::ifstream infile;
   if(flag_extern_file > 0){
@@ -620,6 +623,253 @@ void rapidity_extension::write_rapidity_extended_energy_momentum_conserving_SARJ
 }
 
 
+
+
+// rapidity Extension of the transverse profile generated from MC Glauber.
+// Bozek-Wiskiel titlted fireball ansatz with Bjorken Flow breaking ...
+void rapidity_extension::write_rapidity_extended_Bjorken_flow_breaking_tilted_profile_from_mc_glauber_boost_invariant_deposition
+                 (int flag_nb, int flag_extern_file, std::string extern_file_name ){
+ 
+  cout << "======================================" << endl ; 
+  cout << "=======   Rapidity Extension   =======" << endl ; 
+  cout << "=======         BW model       =======" << endl ; 
+  cout << "=======  Breaking Bjorken Flow =======" << endl ; 
+  cout << "======================================" << endl ; 
+  double eta_max = iparams->etamax ; 
+  int neta = iparams->neta ;
+  double deta = ( 2 * eta_max ) / ( neta - 1 ) ; 
+  if(neta == 1){
+    deta = 0 ; 
+  }
+  double eta_plateau = iparams->matter_eta_plateau ;
+  double eta_fall = iparams->matter_eta_fall ;
+  double etam = iparams->matter_tilt_param ;  
+  double f    = iparams->SARJ_model_f_param ; 
+  std::cout << "eta_plateau = " << eta_plateau << std::endl ; 
+  std::cout << "eta_fall    = " << eta_fall << std::endl ; 
+  std::cout << "etam        = " << etam << std::endl ; 
+  std::cout << "f           = " << f << std::endl ; 
+  std::string dummy_string;
+  double dummy_double ; 
+  int nx ;
+  int ny ; 
+  double dx ; 
+  double dy ; 
+
+ 
+  std::ifstream infile;
+  if(flag_extern_file > 0){
+    cout << "Reading an external file for rapidity extension ..." << endl ;
+    infile.open(extern_file_name.c_str());
+    if (!infile){
+      cout << "Couldn't find external file." << endl ;
+      exit(1);
+    }
+    else{
+      cout<<"External file is : " << extern_file_name.c_str() << endl  ;
+    }
+  }
+  else{
+    cout << "Reading the event averaged profile ..." << endl ;
+    std::string internal_file_name = "output/mc_glauber_boost_invariant_event_averaged_profile_for_rapidity_extension.dat" ; 
+    infile.open(internal_file_name.c_str());
+    if (!infile){
+      cout << "couldn't find the event averaged file." << endl;
+      exit(1);
+    }
+    else{
+      cout << "The event averaged file is : " << internal_file_name.c_str() << endl  ;
+    }
+  }
+ 
+   
+  infile.getline(buff,200);
+  iss = new istringstream(buff);
+  *iss >> dummy_string >> dummy_string >> dummy_double
+       >> dummy_string >> dummy_double >> dummy_string >> nx >> dummy_string >> ny
+       >> dummy_string >> dummy_double >> dummy_string >> dx >> dummy_string >> dy ;
+  delete iss ; 
+ 
+  cout << "nx   = " << nx << endl ; 
+  cout << "ny   = " << ny << endl ; 
+  cout << "dx   = " << dx << endl ; 
+  cout << "dy   = " << dy << endl ; 
+
+ 
+  double x[nx][ny];
+  double y[nx][ny];
+  double wnet[nx][ny];
+  double wa[nx][ny];
+  double wb[nx][ny];
+  double wcoll[nx][ny];
+  double npart_a[nx][ny]; 
+  double npart_b[nx][ny]; 
+  double ncoll[nx][ny];
+  double etasCM[nx][ny];
+
+  // required while setting normalisation constant for baryon profile
+  double net_matter_contribution                      = 0 ; 
+  double matter_contribution_from_a                   = 0 ; 
+  double matter_contribution_from_b                   = 0 ;
+  double matter_contribution_from_binary_collisions   = 0 ; 
+  double npart_of_a                   = 0 ; // Npart contri from nucleus A & B, required to calculate normalisaton
+  double npart_of_b                   = 0 ; // factor of baryon profile.
+  double ncoll_of_ab                  = 0 ;  
+
+
+  for(int ix = 0 ; ix < nx ; ix++ ){
+    for(int iy = 0 ; iy < ny ; iy++ ){
+       infile.getline(buff,200);
+       iss = new istringstream(buff);
+       *iss >> dummy_double >> x[ix][iy] >> y[ix][iy]
+                     >> wnet[ix][iy] >> wa[ix][iy] >> wb[ix][iy] >> wcoll[ix][iy] 
+                     >> npart_a[ix][iy] >> npart_b[ix][iy] >> ncoll[ix][iy] >> dummy_double >> dummy_double >> dummy_double
+                     >> dummy_double  >> dummy_double  >> dummy_double  >> dummy_double ;
+       net_matter_contribution                    += wnet[ix][iy]  ;
+       matter_contribution_from_a                 += wa[ix][iy]    ; 
+       matter_contribution_from_b                 += wb[ix][iy]    ; 
+       matter_contribution_from_binary_collisions += wcoll[ix][iy] ; 
+       npart_of_a  += npart_a[ix][iy]  ;
+       npart_of_b  += npart_b[ix][iy]  ;
+       ncoll_of_ab += ncoll[ix][iy] ; 
+       delete iss ; 
+    }
+  }
+  infile.close();
+  // cout << "total participants : " << (npart_of_a + npart_of_b) << endl ; 
+
+  
+  cout << "Extending in rapidity ... " << endl ; 
+  cout << "neta = " << neta << endl ; 
+  cout << "deta = " << deta << endl ; 
+  if(flag_nb > 0){
+    cout << "Non zero baryon density inside the fluid." << endl ;
+    if(iparams->baryon_rapidity_profile_type == 1){
+      cout << "Baryon rapidty profile type is taken as in arXiv-1804.10557 ... " << endl ;
+    }  
+    if(iparams->baryon_rapidity_profile_type == 2){
+      cout << "Baryon rapidty profile type : iiserbpr quadratic ansatz-2 ... " << endl ;
+    }  
+  }
+
+  double baryon_profile_normalisation = 0. ;
+  double baryon_envelope_a            = 0. ; 
+  double baryon_envelope_b            = 0. ;  
+  double net_deposited_baryon         = 0. ;
+
+  if(flag_nb > 0){
+    if(iparams->baryon_rapidity_profile_type == 1 ){
+      double baryon_weight_temp = ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * ( npart_of_a + npart_of_b ) +
+                                                      iparams->two_component_baryon_deposition_parameter_omega * 2 * ncoll_of_ab ; // 2 should be here. 
+      baryon_profile_normalisation = ( npart_of_a + npart_of_b ) 
+                                   / ( integrate_baryon_density_eta_envelop_profile_arxiv_1804_10557_over_eta() * baryon_weight_temp ) ;
+    }
+    else if(iparams->baryon_rapidity_profile_type == 2){
+      double baryon_weight_temp = ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * ( npart_of_a + npart_of_b ) +
+                                                      iparams->two_component_baryon_deposition_parameter_omega * 2 * ncoll_of_ab ; // 2 should be here. 
+      baryon_profile_normalisation = ( npart_of_a + npart_of_b ) 
+                                   / ( integrate_baryon_density_eta_envelop_profile_iiserbpr_type_2_over_eta() * baryon_weight_temp ) ;
+    }
+    else{
+       std::cout << "Baryon rapidity profile type " << iparams->baryon_rapidity_profile_type << " doesn't exist." << std::endl ; 
+       exit(1);
+    }
+  }
+
+
+  // determine the centre of mass along rapidity direction.
+  for(int ix = 0 ; ix < nx ; ix++ ){
+    for(int iy = 0 ; iy < ny ; iy++ ){
+      double numerator   = 0. ;
+      double denominator = 0. ; 
+      for(int ieta = 0 ; ieta < neta ; ieta++ ){
+        double eta = -eta_max + deta * ieta ; 
+        double plateau_profile = exp(-pow(fabs(eta) - eta_plateau, 2) / ( 2 * pow(eta_fall, 2)) * theta(fabs(eta)-eta_plateau) );
+        double fa = rapidity_asymmetry_ansatz_for_tilt_by_Bozek(eta,etam);
+        double fb = rapidity_asymmetry_ansatz_for_tilt_by_Bozek(-eta,etam);
+        double matter_density =  2. * ( wa[ix][iy] * fa + wb[ix][iy] * fb ) + wcoll[ix][iy]  ;
+        matter_density *= plateau_profile ;
+        matter_density /= ( dx * dy ) ;  // dividing by a constant (dx*dy). During smearing (dx*dy) is multiplied which is scaled down now.
+        numerator   += ( eta * matter_density );
+        denominator += ( matter_density );
+      }
+       etasCM[ix][iy] = numerator / denominator ; 
+    }
+  }
+
+
+  std::ofstream outfile;
+  outfile.open("output/3D_initial_profile_for_music_from_mc_glauber.dat", std::ios::out);
+  outfile<<"#"<<"\t"<<"smooth_profile_idnni"<<"\t"<<"1"<<"\t"<<"neta="<<"\t"<<neta<<"\t"<<"nx="<<"\t"<<nx<<"\t"<<"ny="<<"\t"<<ny
+       <<"\t"<<"deta="<<"\t"<<deta<<"\t"<<"dx="<<"\t"<<dx<<"\t"<<"dy="<<"\t"<<dy<<endl;
+  for(int ieta = 0 ; ieta < neta ; ieta++ ){
+    double eta = -eta_max + deta * ieta ; 
+    cout << "ieta : " << ieta << "  eta : " << eta << endl ; 
+    double plateau_profile = exp(-pow(fabs(eta) - eta_plateau, 2) / ( 2 * pow(eta_fall, 2)) * theta(fabs(eta)-eta_plateau) );
+    double fa = rapidity_asymmetry_ansatz_for_tilt_by_Bozek(eta,etam);
+    double fb = rapidity_asymmetry_ansatz_for_tilt_by_Bozek(-eta,etam);
+
+    if(flag_nb > 0 && iparams->baryon_rapidity_profile_type == 1 ){
+       baryon_envelope_a =  baryon_density_eta_envelop_profile_arxiv_1804_10557(eta, 
+              iparams->baryon_rapidity_profile_eta_peak, iparams->baryon_rapidity_profile_sigma_eta_plus, 
+                  iparams->baryon_rapidity_profile_sigma_eta_minus ) ; 
+       baryon_envelope_b = baryon_density_eta_envelop_profile_arxiv_1804_10557(eta, 
+              -iparams->baryon_rapidity_profile_eta_peak, iparams->baryon_rapidity_profile_sigma_eta_minus, 
+                  iparams->baryon_rapidity_profile_sigma_eta_plus ) ; 
+    }
+
+  
+    if(flag_nb > 0 && iparams->baryon_rapidity_profile_type == 2 ){
+       baryon_envelope_a =  baryon_density_eta_envelop_profile_iiserbpr_type_2(eta, 
+              iparams->iiserbpr_ra_type_2_peak, iparams->iiserbpr_ra_type_2_etal, 
+                  iparams->iiserbpr_ra_type_2_right_fall ) ; 
+       baryon_envelope_b = baryon_density_eta_envelop_profile_iiserbpr_type_2(-eta, 
+               iparams->iiserbpr_ra_type_2_peak, iparams->iiserbpr_ra_type_2_etal, 
+                  iparams->iiserbpr_ra_type_2_right_fall ) ; 
+    }
+ 
+
+
+    for(int ix = 0 ; ix < nx ; ix++ ){
+      for(int iy = 0 ; iy < ny ; iy++ ){
+        double matter_density =  2. * ( wa[ix][iy] * fa + wb[ix][iy] * fb ) + wcoll[ix][iy]  ;
+        matter_density *= plateau_profile ;
+        matter_density /= ( dx * dy ) ;  // dividing by a constant (dx*dy). During smearing (dx*dy) is multiplied which is scaled down now.
+
+        // baryon profile
+        double baryon_density  = 0. ;
+        if(flag_nb > 0 ){
+          baryon_density += baryon_envelope_a * ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * npart_a[ix][iy] ;
+          baryon_density += baryon_envelope_b * ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * npart_b[ix][iy] ;
+          baryon_density += ( baryon_envelope_a + baryon_envelope_b ) * iparams->two_component_baryon_deposition_parameter_omega * ncoll[ix][iy] ;
+          baryon_density *= baryon_profile_normalisation ; 
+          baryon_density /= ( dx * dy ) ;
+        }
+   
+        double strange_density = 0. ;
+        double charge_density  = 0. ;
+        net_deposited_baryon += baryon_density * deta * dx * dy  ;
+
+        // utau, ux,uy will be set inside MUSIC code.
+        outfile << eta << "\t" << x[ix][iy] << "\t" << y[ix][iy] << "\t" << matter_density 
+                << "\t" << f*etasCM[ix][iy] << "\t" << "0" << "\t" << "0" << "\t" << "0" 
+                << "\t" << baryon_density << "\t" << strange_density 
+                << "\t" << charge_density << endl ; 
+      }
+    }
+  }
+  outfile.close();
+  cout << "Net deposited baryon = " << net_deposited_baryon  << endl ; 
+
+  if(flag_nb > 0){ 
+    if(fabs(npart_of_a + npart_of_b - net_deposited_baryon  ) > 2.0 ){
+       std::cout << "Net baryon is not conserved ... " << std::endl ;
+       std::cout << "npart of a = " << npart_of_a << ",  npart of b = " << npart_of_b << ",  sum of baryon density = " << net_deposited_baryon << std::endl ; 
+       exit(1); 
+    }
+ }
+                                                                              
+}
 
 
 

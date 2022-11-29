@@ -30,7 +30,8 @@ class rapidity_extension{
                   (int flag_for_baryon, int flag_for_reading_external_file, std::string external_file_name );
         void write_rapidity_extended_energy_momentum_conserving_SARJ_profile_from_mc_glauber_boost_invariant_deposition
                   (int flag_for_baryon, int flag_for_reading_external_file, std::string external_file_name );
-
+        void write_rapidity_extended_Bjorken_flow_breaking_tilted_profile_from_mc_glauber_boost_invariant_deposition
+                  (int flag_nb, int flag_extern_file, std::string extern_file_name);
 
     private :
         InputData *iparams;
