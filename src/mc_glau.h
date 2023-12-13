@@ -45,6 +45,14 @@ class mc_glau
   void get_nucleus_A(double *X1, double *Y1, double* Z1);
   void get_nucleus_B(double *X2, double *Y2, double* Z2);
 
+  void get_npart_tag_in_nucleus_A(int *xx);
+  void get_npart_tag_in_nucleus_B(int *xx);
+
+  double get_nucleon_shifting_xavg_value(){
+   return shift_xavg_of_nucleons ; }
+  double get_nucleon_shifting_yavg_value(){
+   return shift_yavg_of_nucleons ; }
+
   inline int get_mass_number_of_nucleus_A(){return A;}
   inline int get_mass_number_of_nucleus_B(){return B;}
 
@@ -147,8 +155,16 @@ class mc_glau
   // XB, YB, ZB -> (x,y,z) coordinate of nucleus B.
   double XA[300];double YA[300];double ZA[300];
   double XB[300];double YB[300];double ZB[300];
+  int npart_tag_A[300];
+  int npart_tag_B[300];
   double npart_x[500],npart_y[500];
   double ncoll_x[10000],ncoll_y[10000];
+
+
+  // In order to match the Center of mass of the energy distribution 
+  // with origin (x=0,y=0) one needs to shift the entire system.
+  double shift_xavg_of_nucleons ; 
+  double shift_yavg_of_nucleons ; 
 
   
   // individual contribution

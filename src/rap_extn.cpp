@@ -184,7 +184,7 @@ void rapidity_extension::write_rapidity_extended_tilted_profile_from_idnni_boost
 // rapidity Extension of the transverse profile generated from MC Glauber.
 // Bozek-Wiskiel titlted fireball ansatz.
 void rapidity_extension::write_rapidity_extended_tilted_profile_from_mc_glauber_boost_invariant_deposition
-                 (int flag_nb, int flag_extern_file, std::string extern_file_name ){
+                 (int flag_nb, int flag_extern_file, std::string extern_file_name, int index ){
  
   cout << "==================================" << endl ; 
   cout << "======= Rapidity Extension =======" << endl ; 
@@ -327,8 +327,12 @@ void rapidity_extension::write_rapidity_extended_tilted_profile_from_mc_glauber_
   }
 
   std::ofstream outfile;
-  outfile.open("output/3D_initial_profile_for_music_from_mc_glauber.dat", std::ios::out);
-  outfile<<"#"<<"\t"<<"smooth_profile_idnni"<<"\t"<<"1"<<"\t"<<"neta="<<"\t"<<neta<<"\t"<<"nx="<<"\t"<<nx<<"\t"<<"ny="<<"\t"<<ny
+  std::stringstream output_filename;
+  output_filename.str("");
+  output_filename << "output/3D_initial_profile_for_music_from_mc_glauber_" << index ;
+  output_filename << ".dat";
+  outfile.open(output_filename.str().c_str(), std::ios::out);
+  outfile<<"#"<<"\t"<<"3DProfile"<<"\t"<<"1"<<"\t"<<"neta="<<"\t"<<neta<<"\t"<<"nx="<<"\t"<<nx<<"\t"<<"ny="<<"\t"<<ny
        <<"\t"<<"deta="<<"\t"<<deta<<"\t"<<"dx="<<"\t"<<dx<<"\t"<<"dy="<<"\t"<<dy<<endl;
   for(int ieta = 0 ; ieta < neta ; ieta++ ){
     double eta = -eta_max + deta * ieta ; 

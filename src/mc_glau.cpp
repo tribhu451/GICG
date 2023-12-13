@@ -39,13 +39,16 @@ void mc_glau::event(int flag_for_eccentricity_calculation)
   NCOLL = 1E5;
   IMPACT_PARAM = 1E5;
   
-  for(int j=0;j<=A;j++){XA[j]=0.0;YA[j]=0.0;ZA[j]=0.0;}
-  for(int j=0;j<=B;j++){XB[j]=0.0;YB[j]=0.0;ZB[j]=0.0;}
+  for(int j=0;j<=A;j++){XA[j]=0.0;YA[j]=0.0;ZA[j]=0.0;npart_tag_A[j]=0;}
+  for(int j=0;j<=B;j++){XB[j]=0.0;YB[j]=0.0;ZB[j]=0.0;npart_tag_B[j]=0;}
   for(int j=0;j<500;j++){npart_x[j]=0.0;npart_y[j]=0.0;}
   for(int j=0;j<10000;j++){ncoll_x[j]=0.0;ncoll_y[j]=0.0;}
   
   for(int j=0;j<500;j++){npart_x_of_A[j]=0.0;npart_y_of_A[j]=0.0;}
   for(int j=0;j<500;j++){npart_x_of_B[j]=0.0;npart_y_of_B[j]=0.0;}
+
+  shift_xavg_of_nucleons = 0. ;   
+  shift_yavg_of_nucleons = 0. ;   
   
   //generate orientation angles of target & projectile ...
   double p_ori_theta = f2->GetRandom(0.0,TMath::Pi());  
@@ -203,8 +206,9 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
 	  Ncoll_y[Ncoll]=(vyA[i]+vyB[j])/2;
 	  Ncoll=Ncoll+1;
 	  
-	  if(occA[i]==0){ 
+	  if(occA[i]==0){
 	    occA[i]=1;
+            npart_tag_A[i] = 1 ; 
 	    Npart_x[Npart]=vxA[i];
 	    Npart_y[Npart]=vyA[i];
 	    Npart=Npart+1;
@@ -214,6 +218,7 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
 	  } 
 	  if(occB[j]==0){
 	    occB[j]=1;
+            npart_tag_B[j] = 1 ; 
 	    Npart_x[Npart]=vxB[j];
 	    Npart_y[Npart]=vyB[j];
 	    Npart=Npart+1;
@@ -265,6 +270,9 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
     npart_x_of_B[k] = npart_x_of_B[k]-xAverage;
     npart_y_of_B[k] = npart_y_of_B[k]-yAverage;
   }
+
+  shift_xavg_of_nucleons = xAverage ;   
+  shift_yavg_of_nucleons = yAverage ;   
   
 }
 
@@ -381,6 +389,19 @@ void mc_glau::get_nucleus_B(double *X1, double *Y1, double* Z1)
   }
 }
 
+
+void mc_glau::get_npart_tag_in_nucleus_A(int *xx){
+  for(int j=0;j<A;j++){
+    xx[j] = npart_tag_A[j] ; 
+  }
+}
+
+
+void mc_glau::get_npart_tag_in_nucleus_B(int *xx){
+  for(int j=0;j<B;j++){
+    xx[j] = npart_tag_B[j] ; 
+  }
+}
 
 
 

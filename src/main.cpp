@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <sstream>
 #include "TFile.h"
 #include "TTree.h"
 #include "input_data.h"
@@ -14,6 +15,7 @@
 using std::cout;
 using std::endl;
 using std::to_string;
+using std::istringstream;
 
 
 int main(int argc, char **argv)
@@ -63,6 +65,15 @@ int main(int argc, char **argv)
   //RE ->write_rapidity_extended_Bjorken_flow_breaking_tilted_profile_from_mc_glauber_boost_invariant_deposition(1,0,"xx"); 
 
   JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_ebe_mc_glauber_events(event_no);
+
+  for (int ii=0; ii<event_no; ii++){
+    std::stringstream filename;
+    filename.str("");
+    filename << "output/mc_glauber_boost_invariant_event_averaged_profile_for_rapidity_extension_" << ii ;
+    filename << ".dat";
+    RE ->write_rapidity_extended_tilted_profile_from_mc_glauber_boost_invariant_deposition(1,1,filename.str().c_str(),ii); 
+          // nb flag, external file flag, external file name ;
+  }
 
   delete MC ;
   delete arena ;

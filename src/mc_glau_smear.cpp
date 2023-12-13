@@ -237,7 +237,11 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
     // cout << "the output file could be directly used in boost invariant music ... " << endl ; 
   }
   else{
-    out_file.open("output/mc_glauber_boost_invariant_event_averaged_profile_for_rapidity_extension.dat", std::ios::out);
+    std::stringstream output_filename;
+    output_filename.str("");
+    output_filename << "output/mc_glauber_boost_invariant_event_averaged_profile_for_rapidity_extension_" << event_index ;
+    output_filename << ".dat";
+    out_file.open(output_filename.str().c_str(), std::ios::out);
   }
 
   out_file <<"#"<<"\t"<<"event_avergaed_glauber"<<"\t"<<"1"<<"\t"<<"neta="<<"\t"<<"1"<<"\t"<<"nx="

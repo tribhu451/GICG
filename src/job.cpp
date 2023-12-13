@@ -319,20 +319,98 @@ void job::rotate_by_second_order_participant_plane_and_then_gaussian_smearing_fo
 
 void job::rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_ebe_mc_glauber_events(int event_no){
 
+  std::ofstream outfile;
+  std::stringstream output_filename;
+
+  int Nn = 300 ; 
+  double xxa[Nn] ; 
+  double yya[Nn] ; 
+  double zza[Nn] ; 
+  double xxb[Nn] ; 
+  double yyb[Nn] ; 
+  double zzb[Nn] ;
+  int npart_tag_a[Nn] ; 
+  int npart_tag_b[Nn] ; 
+
+  for(int ii = 0 ; ii < Nn ; ii++ ){
+   xxa[ii] = -999 ; 
+   yya[ii] = -999 ; 
+   zza[ii] = -999 ; 
+   xxb[ii] = 999 ; 
+   yyb[ii] = 999 ; 
+   zzb[ii] = 999 ; 
+   npart_tag_a[ii] = 0 ; 
+   npart_tag_b[ii] = 0 ; 
+  }
+
+   int Norder = 6 ;
+   double epspp[Norder];
+   double phipp[Norder];
+   for(int iorder = 0 ; iorder < Norder ; iorder++ ){
+     epspp[iorder] = 0. ; 
+     phipp[iorder] = 0. ; 
+   }
+
   double b;
   int event_count = 0 ;
   do 
     {
       // It is must in all cases to generate nucleons.
-      MC->event(0);
+      // Here we are also calculating eccentricities and
+      // participant angles //
+      MC->event(1);
       b = MC->get_impactf();
       if( MC->get_two_component_galuber_multiplicity_proxy() > iparams->lower_mult_proxy_cut && 
              MC->get_two_component_galuber_multiplicity_proxy() <= iparams->upper_mult_proxy_cut ){
+
+           epspp[0] = MC->eccen1() ; 
+           phipp[0] = MC->phi1();
+           epspp[1] = MC->eccen2() ; 
+           phipp[1] = MC->phi2();
+           epspp[2] = MC->eccen3() ; 
+           phipp[2] = MC->phi3();
+           epspp[3] = MC->eccen4() ; 
+           phipp[3] = MC->phi4();
+           epspp[4] = MC->eccen5() ; 
+           phipp[4] = MC->phi5();
+           epspp[5] = MC->eccen6() ; 
+           phipp[5] = MC->phi6();
+           MC->get_nucleus_A(xxa,yya,zza) ; 
+           MC->get_nucleus_B(xxb,yyb,zzb) ; 
+           MC->get_npart_tag_in_nucleus_A(npart_tag_a) ; 
+           MC->get_npart_tag_in_nucleus_B(npart_tag_b) ; 
+
+           output_filename.str("");
+           output_filename << "output/mc_glauber_event_details_" << event_count ;
+           output_filename << ".dat";
+           outfile.open(output_filename.str().c_str(), std::ios::out);
+           outfile << "# Event_No  A  B  b  npart  npart_A  npart_B  ncoll  nch_proxy  shift_xavg  shift_yavg" << std::endl ; 
+           outfile << event_no << "  " << MC->get_mass_number_of_nucleus_A() << "  " 
+                << MC->get_mass_number_of_nucleus_B() << "  " <<  MC->get_impactf() << "  " << MC->get_npart() << "  " 
+                << MC->get_no_of_participants_in_nucleus_a() << "  " << MC->get_no_of_participants_in_nucleus_b() << "  "
+                << MC->get_ncoll() << "  " << MC->get_two_component_galuber_multiplicity_proxy()  << "  "  
+                << MC->get_nucleon_shifting_xavg_value() << "  " << MC->get_nucleon_shifting_yavg_value() << std::endl ;
+ 
+           outfile << "# e1  pp1  e2  pp2 ... e6  pp6" << std::endl ; 
+           for(int iorder = 0 ; iorder < Norder ; iorder++ ){
+             outfile << epspp[iorder] << "  " << phipp[iorder] << "  " ;  
+           }
+           outfile << std::endl ; 
+           outfile << "#(Nucleons of nucleus-A) x  y  z  participant_tag" << std::endl ; 
+           for(int ii = 0 ; ii < MC->get_mass_number_of_nucleus_A() ; ii++ ){
+            outfile << xxa[ii] << "  " << yya[ii] << "  " << zza[ii] << "  " << npart_tag_a[ii] << std::endl ; 
+           }
+           outfile << "#(Nucleons of nucleus-B) x  y  z  participant_tag" << std::endl ; 
+           for(int ii = 0 ; ii < MC->get_mass_number_of_nucleus_B() ; ii++ ){
+            outfile << xxb[ii] << "  " << yyb[ii] << "  " << zzb[ii] << "  " << npart_tag_b[ii] << std::endl ; 
+           }
+           outfile.close();
 
            std::cout << "event no = " << event_count << ",  b = " << b << " (fm),  Npart = " << MC->get_npart() << std::endl ; 
            MCGlbS->smear_it(iparams->gaussian_smearing_sigma);
            MCGlbS->update_contribution_on_cells_over_all_events_with_gaussian_smearing();
            MCGlbS->write_event_averaged_profile_to_file_after_gaussian_smearing(1,1,event_count);
+           MCGlbS->write_event_averaged_profile_to_file_after_gaussian_smearing(1,0,event_count);
            MCGlbS->reset_contribution_from_all_events_to_zero_on_the_cells();
            event_count++;
       }
