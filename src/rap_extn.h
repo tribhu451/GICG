@@ -48,6 +48,12 @@ class rapidity_extension{
         double baryon_density_eta_envelop_profile_iiserbpr_type_2_function(double* x, double* p);
         double integrate_baryon_density_eta_envelop_profile_iiserbpr_type_2_over_eta();
 
+        // IISER Berhampur baryon rapidity ansatz-3 //
+        double baryon_density_eta_envelop_profile_iiserbpr_type_3(double eta, double eta0, double sig);
+        double baryon_density_eta_envelop_profile_iiserbpr_type_3_function(double* x, double* p);
+        double integrate_baryon_density_eta_envelop_profile_iiserbpr_type_3_over_eta();
+
+
 };
 
 
