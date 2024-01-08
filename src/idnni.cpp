@@ -46,8 +46,8 @@ void idnni::perform()
   double radius_of_nucleon = sqrt ( mc->get_inelastic_cross_section() / (4*PI) )  ;
   
   
-  mc->get_nucleus_A(XA, YA, ZA);
-  mc->get_nucleus_B(XB, YB, ZB);
+  mc->get_nucleus_A(XA, YA, ZA, pflagA);
+  mc->get_nucleus_B(XB, YB, ZB, pflagB);
   
   // std::ofstream file_0;
   // file_0.open("nucleus_a.dat");

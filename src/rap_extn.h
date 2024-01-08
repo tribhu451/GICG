@@ -27,7 +27,7 @@ class rapidity_extension{
         void write_rapidity_extended_tilted_profile_from_idnni_boost_invariant_deposition
                   (int flag_for_baryon, int flag_for_reading_external_file, std::string external_file_name );
         void write_rapidity_extended_tilted_profile_from_mc_glauber_boost_invariant_deposition
-                  (int flag_for_baryon, int flag_for_reading_external_file, std::string external_file_name, int index );
+                  (int flag_for_baryon, int flag_for_reading_external_file, std::string external_file_name );
         void write_rapidity_extended_energy_momentum_conserving_SARJ_profile_from_mc_glauber_boost_invariant_deposition
                   (int flag_for_baryon, int flag_for_reading_external_file, std::string external_file_name );
         void write_rapidity_extended_Bjorken_flow_breaking_tilted_profile_from_mc_glauber_boost_invariant_deposition
@@ -47,12 +47,6 @@ class rapidity_extension{
         double baryon_density_eta_envelop_profile_iiserbpr_type_2(double eta, double eta_0, double eta_L, double sig);
         double baryon_density_eta_envelop_profile_iiserbpr_type_2_function(double* x, double* p);
         double integrate_baryon_density_eta_envelop_profile_iiserbpr_type_2_over_eta();
-
-        // IISER Berhampur baryon rapidity ansatz-3 //
-        double baryon_density_eta_envelop_profile_iiserbpr_type_3(double eta, double eta0, double sig);
-        double baryon_density_eta_envelop_profile_iiserbpr_type_3_function(double* x, double* p);
-        double integrate_baryon_density_eta_envelop_profile_iiserbpr_type_3_over_eta();
-
 
 };
 

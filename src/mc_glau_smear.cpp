@@ -1,12 +1,14 @@
 #include "mc_glau_smear.h"
 
-mc_glau_smear::mc_glau_smear(InputData *inparams_,grid* arena_, mc_glau* _mc){
+mc_glau_smear::mc_glau_smear(InputData *inparams_,grid* arena_, mc_glau* _mc ){
   inparams = inparams_ ; 
   mc = _mc ;
   arena = arena_ ; 
+  specsm = new smear_spec_ch(inparams_,arena_, _mc);
 }
 
 mc_glau_smear::~mc_glau_smear(){
+ delete specsm ;
 }
 
 void mc_glau_smear::smear_it(double sigma_perp){
@@ -198,11 +200,18 @@ void mc_glau_smear::smear_it(double sigma_perp){
      exit(1);
    }
 
+  
+   // spectator charge smearing
+   specsm->smear_spectator_protons_charge(sigma_perp, phipp[2]);
+
+
+
 }
 
 
 
 void mc_glau_smear::update_contribution_on_cells_over_all_events_with_gaussian_smearing(){
+
   for(int ix = 0 ; ix < arena->get_nx() ; ix++ ){
     for(int iy = 0 ; iy < arena->get_ny() ; iy++ ){
 	arena->get_cell(ix,iy)->update_contribution_from_nucleus_a_over_all_events(arena->get_cell(ix,iy)->get_contri_from_nucleus_a_after_gaussian_smearing()) ;
@@ -211,22 +220,28 @@ void mc_glau_smear::update_contribution_on_cells_over_all_events_with_gaussian_s
                               (arena->get_cell(ix,iy)->get_contri_from_binary_collisions_after_gaussian_smearing()) ;
     }
   }
+   // spectator charge profile
+   specsm->update_charge_contribution_on_cells_over_all_events_with_spectator_gaussian_smearing();
+
 }
 
 
 // relevant to generate Event-by-Event MC Glauber IC for hydro input. //
 void mc_glau_smear::reset_contribution_from_all_events_to_zero_on_the_cells(){
+
   for(int ix = 0 ; ix < arena->get_nx() ; ix++ ){
     for(int iy = 0 ; iy < arena->get_ny() ; iy++ ){
       arena->get_cell(ix,iy)->reset_contributions_to_zero();
     }
   }
+   // spectator charge profile
+   specsm->reset_spectator_charge_contribution_from_all_events_to_zero_on_the_cells();
+
 }
 
 
 // Write the event averaged profile in MUSIC format.
 void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing(int nEvents, int flag_to_generate_music_boost_invariant_file, int event_index){
-  
   std::ofstream out_file;
   if(flag_to_generate_music_boost_invariant_file > 0 ){
     std::stringstream output_filename;
@@ -237,11 +252,7 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
     // cout << "the output file could be directly used in boost invariant music ... " << endl ; 
   }
   else{
-    std::stringstream output_filename;
-    output_filename.str("");
-    output_filename << "output/mc_glauber_boost_invariant_event_averaged_profile_for_rapidity_extension_" << event_index ;
-    output_filename << ".dat";
-    out_file.open(output_filename.str().c_str(), std::ios::out);
+    out_file.open("output/mc_glauber_boost_invariant_event_averaged_profile_for_rapidity_extension.dat", std::ios::out);
   }
 
   out_file <<"#"<<"\t"<<"event_avergaed_glauber"<<"\t"<<"1"<<"\t"<<"neta="<<"\t"<<"1"<<"\t"<<"nx="
@@ -317,12 +328,229 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
   std::cout << "total participant after event averaging = " << total_participants_after_event_averaging << std::endl ; 
   std::cout << "participant assymetry : " << ( participant_diff / participant_sum )  * 100 << " %" << std::endl ; 
 
+
 }
 
 
 
+void mc_glau_smear::calculate_and_write_EM_field_profile_to_file(int nEvents, int event_index){
+  specsm->write_event_averaged_spectator_charge_profile_to_file_after_gaussian_smearing(nEvents,event_index);
+  specsm->write_event_averaged_spectator_charge_profile_to_file_after_gaussian_smearing_with_symmetry(nEvents,event_index);
+  specsm->write_EM_field_from_event_averaged_spectator_charge_profile_to_file_assuming_symmetry(nEvents,event_index);
+}
 
 
+void mc_glau_smear::write_nucleus_details_of_one_event(int eventid){
+
+  //std::cout << "==================================================================" << std::endl ; 
+  //std::cout << "No. of participants = " << mc->get_npart() << std::endl ; 
+  //std::cout << "No. of participants in A = " << mc->get_no_of_participants_in_nucleus_a() << std::endl ; 
+  //std::cout << "No. of participants in B = " << mc->get_no_of_participants_in_nucleus_b() << std::endl ; 
+
+  
+  double spec_x_of_nucleus_a[500],spec_y_of_nucleus_a[500]; int spec_proton_flags_of_a[500] ;
+  double spec_x_of_nucleus_b[500],spec_y_of_nucleus_b[500]; int spec_proton_flags_of_b[500] ;
+  double xa[500],ya[500],za[500]; int pflaga[500] ;
+  double xb[500],yb[500],zb[500]; int pflagb[500];
+
+  for(int ii = 0; ii < 500; ii++){
+    npart_x[ii] = -9999. ; 
+    npart_y[ii] =  9999. ; 
+  }
+
+  for(int ii = 0; ii < 500; ii++){
+    npart_x_of_nucleus_a[ii] = -9999. ; 
+    npart_y_of_nucleus_a[ii] =  9999. ; 
+  }
+
+  for(int ii = 0; ii < 500; ii++){
+    npart_x_of_nucleus_b[ii] = -9999. ; 
+    npart_y_of_nucleus_b[ii] =  9999. ; 
+  }
+
+  for(int ii = 0; ii < 10000; ii++){
+    ncoll_x[ii] = -9999. ; 
+    ncoll_y[ii] =  9999. ; 
+  }
+
+  for(int ii = 0; ii < 500; ii++){
+    spec_x_of_nucleus_a[ii] = -9999. ; 
+    spec_y_of_nucleus_a[ii] =  9999. ; 
+    spec_proton_flags_of_a[ii] = 0 ;
+    spec_x_of_nucleus_b[ii] = -9999. ; 
+    spec_y_of_nucleus_b[ii] =  9999. ; 
+    spec_proton_flags_of_b[ii] = 0 ;
+  }
+
+  for(int ii = 0; ii < 500; ii++){
+    xa[ii] = -9999. ; 
+    ya[ii] = -9999. ; 
+    za[ii] = -9999. ;
+    xb[ii] = -9999. ; 
+    yb[ii] = -9999. ; 
+    zb[ii] = -9999. ;
+    pflaga[ii] = 0 ; 
+    pflagb[ii] = 0 ; 
+  }
+
+
+  // collect the npart and ncoll sources info from MC Glauber class.
+  int npart = mc->get_npart() ;  
+  int ncoll = mc->get_ncoll() ; 
+  int npartA = mc->get_no_of_participants_in_nucleus_a() ; 
+  int npartB = mc->get_no_of_participants_in_nucleus_b() ; 
+  int nspecA = mc->get_no_of_spectators_in_nucleus_a();
+  int nspecB = mc->get_no_of_spectators_in_nucleus_b();
+  mc->get_npart_source_positions(npart_x, npart_y); 
+  mc->get_npart_source_positions_of_nucleus_a(npart_x_of_nucleus_a, npart_y_of_nucleus_a); 
+  mc->get_npart_source_positions_of_nucleus_b(npart_x_of_nucleus_b, npart_y_of_nucleus_b); 
+  mc->get_ncoll_source_positions(ncoll_x, ncoll_y);
+  mc->get_spectator_positions_and_its_proton_flags_of_nucleus_a(spec_x_of_nucleus_a, spec_y_of_nucleus_a,spec_proton_flags_of_a); 
+  mc->get_spectator_positions_and_its_proton_flags_of_nucleus_b(spec_x_of_nucleus_b, spec_y_of_nucleus_b,spec_proton_flags_of_b);
+  mc->get_nucleus_A(xa,ya,za,pflaga); 
+  mc->get_nucleus_B(xb,yb,zb,pflagb); 
+
+  // the sources are already adjusted to give CM = (0,0)
+
+  // print the collected info
+  /*
+  for(int ipart=0; ipart<npart; ipart++){
+    std::cout << ipart << "  " << npart_x[ipart] << "  " << npart_y[ipart] << std::endl ; 
+  }
+  std::cout << "===========================================================" << std::endl ; 
+  for(int icoll=0; icoll<ncoll; icoll++){
+    std::cout << icoll << "  " << ncoll_x[icoll] << "  " << ncoll_y[icoll] << std::endl ; 
+  }
+  */
+    
+
+  std::ofstream file;
+  std::stringstream output_filename;
+
+
+  output_filename.str("");
+  output_filename << "output/nucleons_of_NucleusA_in_event_" ;
+  output_filename << eventid ;
+  output_filename << ".dat" ;
+  file.open(output_filename.str().c_str(), std::ios::out);
+  file << "# Nucleon_No.  x   y  z " << std::endl ; 
+  for(int ii=0; ii<mc->get_mass_number_of_nucleus_A(); ii++){
+    file << ii << "  " << xa[ii] << "  " << ya[ii] << "  " << za[ii] << std::endl ; 
+  }
+  file.close();
+
+  output_filename.str("");
+  output_filename << "output/nucleons_of_NucleusB_in_event_" ;
+  output_filename << eventid ;
+  output_filename << ".dat" ;
+  file.open(output_filename.str().c_str(), std::ios::out);
+  file << "# Nucleon_No.  x   y  z " << std::endl ; 
+  for(int ii=0; ii<mc->get_mass_number_of_nucleus_B(); ii++){
+    file << ii << "  " << xb[ii] << "  " << yb[ii] << "  " << zb[ii] << std::endl ; 
+  }
+  file.close();
+
+
+  output_filename.str("");
+  output_filename << "output/protons_of_NucleusA_in_event_" ;
+  output_filename << eventid ;
+  output_filename << ".dat" ;
+  file.open(output_filename.str().c_str(), std::ios::out);
+  file << "# Nucleon_No.  x   y  z " << std::endl ; 
+  for(int ii=0; ii<mc->get_mass_number_of_nucleus_A(); ii++){
+    if(pflaga[ii]>0){
+      file << ii << "  " << xa[ii] << "  " << ya[ii] << "  " << za[ii] << std::endl ;
+    } 
+  }
+  file.close();
+
+  output_filename.str("");
+  output_filename << "output/protons_of_NucleusB_in_event_" ;
+  output_filename << eventid ;
+  output_filename << ".dat" ;
+  file.open(output_filename.str().c_str(), std::ios::out);
+  file << "# Nucleon_No.  x   y  z " << std::endl ; 
+  for(int ii=0; ii<mc->get_mass_number_of_nucleus_B(); ii++){
+    if(pflagb[ii]>0){
+      file << ii << "  " << xb[ii] << "  " << yb[ii] << "  " << zb[ii] << std::endl ;
+    } 
+  }
+  file.close();
+
+
+  output_filename.str("");
+  output_filename << "output/participants_of_NucleusA_in_event_" ;
+  output_filename << eventid ;
+  output_filename << ".dat" ;
+  file.open(output_filename.str().c_str(), std::ios::out);
+  file << "# Participant_No.  x   y " << std::endl ; 
+  for(int ii=0; ii<npartA; ii++){
+    file << ii << "  " << npart_x_of_nucleus_a[ii] << "  " << npart_y_of_nucleus_a[ii] << std::endl ; 
+  }
+  file.close();
+
+  output_filename.str("");
+  output_filename << "output/participants_of_NucleusB_in_event_" ;
+  output_filename << eventid ;
+  output_filename << ".dat" ;
+  file.open(output_filename.str().c_str(), std::ios::out);
+  file << "# Participant_No.  x   y " << std::endl ; 
+  for(int ii=0; ii<npartB; ii++){
+    file << ii << "  " << npart_x_of_nucleus_b[ii] << "  " << npart_y_of_nucleus_b[ii] << std::endl ; 
+  }
+  file.close();
+
+  output_filename.str("");
+  output_filename << "output/spectators_of_NucleusA_in_event_" ;
+  output_filename << eventid ;
+  output_filename << ".dat" ;
+  file.open(output_filename.str().c_str(), std::ios::out);
+  file << "# spectator_No.  x   y " << std::endl ; 
+  for(int ii=0; ii<nspecA; ii++){
+    file << ii << "  " << spec_x_of_nucleus_a[ii] << "  " << spec_y_of_nucleus_a[ii] << std::endl ; 
+  }
+  file.close();
+
+  output_filename.str("");
+  output_filename << "output/spectators_of_NucleusB_in_event_" ;
+  output_filename << eventid ;
+  output_filename << ".dat" ;
+  file.open(output_filename.str().c_str(), std::ios::out);
+  file << "# spectator_No.  x   y " << std::endl ; 
+  for(int ii=0; ii<nspecB; ii++){
+    file << ii << "  " << spec_x_of_nucleus_b[ii] << "  " << spec_y_of_nucleus_b[ii] << std::endl ; 
+  }
+  file.close();
+
+
+  output_filename.str("");
+  output_filename << "output/spectator_protons_of_NucleusA_in_event_" ;
+  output_filename << eventid ;
+  output_filename << ".dat" ;
+  file.open(output_filename.str().c_str(), std::ios::out);
+  file << "# spectator_No.  x   y " << std::endl ; 
+  for(int ii=0; ii<nspecA; ii++){
+    if(spec_proton_flags_of_a[ii]>0){
+      file << ii << "  " << spec_x_of_nucleus_a[ii] << "  " << spec_y_of_nucleus_a[ii] << std::endl ;
+    } 
+  }
+  file.close();
+
+  output_filename.str("");
+  output_filename << "output/spectator_protons_of_NucleusB_in_event_" ;
+  output_filename << eventid ;
+  output_filename << ".dat" ;
+  file.open(output_filename.str().c_str(), std::ios::out);
+  file << "# spectator_No.  x   y " << std::endl ; 
+  for(int ii=0; ii<nspecB; ii++){
+    if(spec_proton_flags_of_b[ii]>0){
+      file << ii << "  " << spec_x_of_nucleus_b[ii] << "  " << spec_y_of_nucleus_b[ii] << std::endl ;
+    } 
+  }
+  file.close();
+
+
+}
 
 
 

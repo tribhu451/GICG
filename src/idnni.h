@@ -70,7 +70,8 @@ class idnni{
   double XB[300];
   double YB[300];
   double ZB[300];
-  
+  int pflagA[300]; // proton flag
+  int pflagB[300] ; 
   
   double max(double a, double b){
     if(a>b){

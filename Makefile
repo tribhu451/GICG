@@ -18,14 +18,15 @@ LIBS          = $(ROOTLIBS) $(SYSLIBS) $(GSLLIBS)
 vpath %.cpp src
 objdir     = obj
 
-SRC        = main.cpp job.cpp grid.cpp  mc_glau.cpp idnni.cpp cell.cpp rap_extn.cpp mc_glau_smear.cpp
+SRC        = main.cpp job.cpp grid.cpp  mc_glau.cpp idnni.cpp cell.cpp rap_extn.cpp\
+              mc_glau_smear.cpp smear_spec_ch.cpp
              
 OBJS       = $(patsubst %.cpp,$(objdir)/%.o,$(SRC)) 
               
-TARGET	   = mc_glauber
+TARGET	   = mc_glauber_spec
 #-------------------------------------------------------------------------------
-$(TARGET):       $(OBJS)
-		$(LD)  $(LDFLAGS) $^ -o $@ $(LIBS)
+$(TARGET):       $(OBJS) 
+		$(LD)  -fopenmp $(LDFLAGS) $^ -o $@ $(LIBS)
 		@echo "$@ done"
 clean:
 		@rm -f $(OBJS) $(TARGET)
@@ -40,4 +41,4 @@ $(objdir):
 	@mkdir -p $(objdir)
 	
 obj/%.o : %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) -fopenmp $(CXXFLAGS) -c $< -o $@

@@ -2,6 +2,7 @@
 #include<iostream>
 #include "input_data.h"
 #include "mc_glau.h"
+#include "smear_spec_ch.h"
 #include "cell.h"
 #include "grid.h"
 
@@ -15,12 +16,14 @@ class mc_glau_smear {
     void smear_it(double );
     void update_contribution_on_cells_over_all_events_with_gaussian_smearing();
     void write_event_averaged_profile_to_file_after_gaussian_smearing(int nEvents, int flag_to_generate_music_boost_invariant_file, int event_index);
+    void calculate_and_write_EM_field_profile_to_file(int nEvents, int event_index);
     void reset_contribution_from_all_events_to_zero_on_the_cells();
-
+    void write_nucleus_details_of_one_event(int aidx);
   private :
     mc_glau* mc;
     grid* arena ; 
     InputData *inparams;
+    smear_spec_ch *specsm ; 
 
     int    npart, ncoll                   ; 
     double npart_x[500],npart_y[500]      ;

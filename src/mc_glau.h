@@ -34,6 +34,8 @@ class mc_glau
   inline int get_npart(){return NPART;}
   inline int get_no_of_participants_in_nucleus_a(){return Nparticipants_from_A;}
   inline int get_no_of_participants_in_nucleus_b(){return Nparticipants_from_B;}
+  inline int get_no_of_spectators_in_nucleus_a(){return spectators_from_A;}
+  inline int get_no_of_spectators_in_nucleus_b(){return spectators_from_B;}
   inline int get_ncoll(){return NCOLL;}
   inline double get_two_component_galuber_multiplicity_proxy(){
     return  InData->npp * 0.5 * get_npart()* ( 1.0 - InData->xhard ) +  InData->npp * InData->xhard * get_ncoll() ; 
@@ -42,19 +44,14 @@ class mc_glau
   void calculate_eccentricity(int Norder, int aN_part,int aN_coll,double *Npart_x,
                      double *Npart_y,double *Ncoll_x,double *Ncoll_y, double* eps, double* psi);
 
-  void get_nucleus_A(double *X1, double *Y1, double* Z1);
-  void get_nucleus_B(double *X2, double *Y2, double* Z2);
-
-  void get_npart_tag_in_nucleus_A(int *xx);
-  void get_npart_tag_in_nucleus_B(int *xx);
-
-  double get_nucleon_shifting_xavg_value(){
-   return shift_xavg_of_nucleons ; }
-  double get_nucleon_shifting_yavg_value(){
-   return shift_yavg_of_nucleons ; }
+  void get_nucleus_A(double *X1, double *Y1, double* Z1, int* );
+  void get_nucleus_B(double *X2, double *Y2, double* Z2, int* );
 
   inline int get_mass_number_of_nucleus_A(){return A;}
   inline int get_mass_number_of_nucleus_B(){return B;}
+  inline int get_atomic_number_of_nucleus_A(){return AZ;}
+  inline int get_atomic_number_of_nucleus_B(){return BZ;}
+
 
   inline double get_radius_of_nucleus_A(){return p_radius;}
   inline double get_radius_of_nucleus_B(){return t_radius;}
@@ -105,6 +102,22 @@ class mc_glau
   }
 
 
+  inline void get_spectator_positions_and_its_proton_flags_of_nucleus_a(double *xx, double* yy, int* pflag){
+    for(int ii=0; ii<500; ii++){
+      xx[ii] = spec_x_of_A[ii] ; 
+      yy[ii] = spec_y_of_A[ii] ; 
+      pflag[ii] = spec_proton_flags_of_A[ii] ; 
+    }
+  }
+
+
+  inline void get_spectator_positions_and_its_proton_flags_of_nucleus_b(double *xx, double* yy, int* pflag){
+    for(int ii=0; ii<500; ii++){
+      xx[ii] = spec_x_of_B[ii] ; 
+      yy[ii] = spec_y_of_B[ii] ; 
+      pflag[ii] = spec_proton_flags_of_B[ii] ; 
+    }
+  }
 
  
  private:
@@ -112,6 +125,8 @@ class mc_glau
   
   int A; // mass no. of projrctile nucleus
   int B; // mass no. of target nucleus
+  int AZ; // atomic no. of projrctile nucleus
+  int BZ; // atomic no. of target nucleus
   double sigma; // energy-> cross-section
   
 // projectie wood-Saxon parameters
@@ -131,9 +146,12 @@ class mc_glau
   int NCOLL;
   double IMPACT_PARAM;
 
-// individual contribution
+  // individual contribution
   int Nparticipants_from_A ; 
   int Nparticipants_from_B ; 
+  int spectators_from_A ; 
+  int spectators_from_B ; 
+
 
 // two-component energy deposition
   double npp;
@@ -148,34 +166,35 @@ class mc_glau
 
   TRandom3* t1;
   TRandom3* tr1;
+  TRandom3* tr2;
   TF1* f1;
   TF1* f2;
 
-  // XA, YA, ZA -> (x,y,z) coordinate of nucleus A.
-  // XB, YB, ZB -> (x,y,z) coordinate of nucleus B.
-  double XA[300];double YA[300];double ZA[300];
-  double XB[300];double YB[300];double ZB[300];
-  int npart_tag_A[300];
-  int npart_tag_B[300];
+  // XA, YA, ZA -> (x,y,z) coordinate of nucleons in nucleus A.
+  // XB, YB, ZB -> (x,y,z) coordinate of nucleons in nucleus B.
+  // PROT_FLAG_X -> indicates wheather the nucleon is a proton or not. 
+  double XA[300];double YA[300];double ZA[300]; int PROT_FLAG_A[300];
+  double XB[300];double YB[300];double ZB[300]; int PROT_FLAG_B[300];  
   double npart_x[500],npart_y[500];
   double ncoll_x[10000],ncoll_y[10000];
 
-
-  // In order to match the Center of mass of the energy distribution 
-  // with origin (x=0,y=0) one needs to shift the entire system.
-  double shift_xavg_of_nucleons ; 
-  double shift_yavg_of_nucleons ; 
-
   
-  // individual contribution
+  // x and y coordinate of nparts coming from nucleus A and B.
   double npart_x_of_A[500],npart_y_of_A[500];
   double npart_x_of_B[500],npart_y_of_B[500];
 
+  // x and y cordinate of spectators and the flag to indicate 
+  // whether the spectator is a proton or not.
+  // "A" stands for projectile whereas "B" stands for target nucleus.
+  double spec_x_of_A[500],spec_y_of_A[500],spec_proton_flags_of_A[500];
+  double spec_x_of_B[500],spec_y_of_B[500],spec_proton_flags_of_B[500];
 
-  void generate_nucleus(double* X1, double* Y1,double* Z1,int A,
+
+
+  void generate_nucleus(double* X1, double* Y1,double* Z1,int* PROT_FLAG___, int A, int ATOMIC_NO,
 			double R, double dlt, double BETA2, double BETA4, double etaA, double psiA);
   
-  void calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* vyB, int &Npart, 
+  void calculate_npart_ncoll(double* vxA,double* vyA, int* , double* vxB,double* vyB, int* , int &Npart, 
 			     int &Ncoll, double* Npart_x, double* Npart_y, double* Ncoll_x, double* Ncoll_y);
   
   void shift_nucleus(double* X1, double* Y1, double* Z1,int A, double b,
@@ -191,22 +210,22 @@ void set_mc_glau_params()
   X_hard = InData->xhard;
 
   // projectile nucleus
-  if(InData->projectile == "Au") {A= 197; p_radius = 6.42; p_dlt=0.41; p_beta2 = -0.13; p_beta4 =0.0;} //arXiv: 1409.8375 [Table. 1]
-  else if(InData->projectile == "Au2") {A= 197; p_radius = 6.37; p_dlt=0.53; p_beta2 = 0.0; p_beta4 =0.0;} //arXiv: 1409.8375 [Table. 1]
-  else if(InData->projectile == "Pb") {A= 208; p_radius = 6.66; p_dlt=0.45; p_beta2 = 0.0; p_beta4 =0.0;}
-  else if(InData->projectile == "p") {A= 1; p_radius = 0.1; p_dlt=0.1; p_beta2 = 0.0; p_beta4 =0.0;} // woods-saxon params can be ignored-
+  if(InData->projectile == "Au") {A=197; AZ=79; p_radius = 6.42; p_dlt=0.41; p_beta2 = -0.13; p_beta4 =0.0;} //arXiv: 1409.8375 [Table. 1]
+  else if(InData->projectile == "Au2") {A=197; AZ=79; p_radius = 6.37; p_dlt=0.53; p_beta2 = 0.0; p_beta4 =0.0;} //arXiv: 1409.8375 [Table. 1]
+  else if(InData->projectile == "Pb") {A=208; AZ=82; p_radius = 6.66; p_dlt=0.45; p_beta2 = 0.0; p_beta4 =0.0;}
+  else if(InData->projectile == "p") {A=1; AZ=1; p_radius = 0.1; p_dlt=0.1; p_beta2 = 0.0; p_beta4 =0.0;} // woods-saxon params can be ignored-
   //because we will sample only one nucleon.
-  else if(InData->projectile == "U") {A= 238; p_radius = 6.86; p_dlt=0.42; p_beta2 = 0.265; p_beta4 =0.093;}
-  else if(InData->projectile == "U2") {A= 238; p_radius = 6.86; p_dlt=0.42; p_beta2 = 0.0; p_beta4 =0.0;}
+  else if(InData->projectile == "U") {A=238; AZ=92; p_radius = 6.86; p_dlt=0.42; p_beta2 = 0.265; p_beta4 =0.093;}
+  else if(InData->projectile == "U2") {A=238; AZ=92; p_radius = 6.86; p_dlt=0.42; p_beta2 = 0.0; p_beta4 =0.0;}
   else {cout<<"projectile not recognized, it's : "<<InData->projectile<<endl; exit(1);}
   
   // target nucleus
-  if(InData->target == "Au") {B= 197; t_radius = 6.42; t_dlt=0.41; t_beta2 = -0.13; t_beta4 =0.0;}
-  else if(InData->target == "Au2") {B= 197; t_radius = 6.37; t_dlt=0.53; t_beta2 = 0.00; t_beta4 =0.0;} 
-  else if(InData->target == "Pb") {B= 208; t_radius = 6.66; t_dlt=0.45; t_beta2 = 0.0; t_beta4 =0.0;}
-  else if(InData->target == "p") {B= 1; t_radius = 0.1; t_dlt=0.1; t_beta2 = 0.0; t_beta4 =0.0;}
-  else if(InData->target == "U"){B =238;  t_radius = 6.86; t_dlt=0.42; t_beta2 = 0.265; t_beta4 =0.093;}
-  else if(InData->target == "U2"){B =238;  t_radius = 6.86; t_dlt=0.42; t_beta2 = 0.0; t_beta4 =0.0;}
+  if(InData->target == "Au") {B=197; BZ=79; t_radius = 6.42; t_dlt=0.41; t_beta2 = -0.13; t_beta4 =0.0;}
+  else if(InData->target == "Au2") {B=197; BZ=79; t_radius = 6.37; t_dlt=0.53; t_beta2 = 0.00; t_beta4 =0.0;} 
+  else if(InData->target == "Pb") {B=208; BZ=82, t_radius = 6.66; t_dlt=0.45; t_beta2 = 0.0; t_beta4 =0.0;}
+  else if(InData->target == "p") {B=1; BZ=1; t_radius = 0.1; t_dlt=0.1; t_beta2 = 0.0; t_beta4 =0.0;}
+  else if(InData->target == "U"){B=238;  BZ=92; t_radius = 6.86; t_dlt=0.42; t_beta2 = 0.265; t_beta4 =0.093;}
+  else if(InData->target == "U2"){B=238; BZ=92; t_radius = 6.86; t_dlt=0.42; t_beta2 = 0.0; t_beta4 =0.0;}
   else {cout<<"target not recognized, it's : "<<InData->target<<endl; exit(1);}
   
 

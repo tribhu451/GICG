@@ -21,6 +21,9 @@ mc_glau::mc_glau(InputData *InData1)
   // Random number generators to be used in function generate_nucleus().
   tr1 = new TRandom3();
   tr1->SetSeed(0);
+  tr2 = new TRandom3();
+  tr2->SetSeed(0);
+
 }
 
 mc_glau::~mc_glau()
@@ -39,16 +42,17 @@ void mc_glau::event(int flag_for_eccentricity_calculation)
   NCOLL = 1E5;
   IMPACT_PARAM = 1E5;
   
-  for(int j=0;j<=A;j++){XA[j]=0.0;YA[j]=0.0;ZA[j]=0.0;npart_tag_A[j]=0;}
-  for(int j=0;j<=B;j++){XB[j]=0.0;YB[j]=0.0;ZB[j]=0.0;npart_tag_B[j]=0;}
-  for(int j=0;j<500;j++){npart_x[j]=0.0;npart_y[j]=0.0;}
-  for(int j=0;j<10000;j++){ncoll_x[j]=0.0;ncoll_y[j]=0.0;}
+  for(int j=0;j<=A;j++){XA[j]=1000.;YA[j]=1000.;ZA[j]=1000.;PROT_FLAG_A[j]=0;}
+  for(int j=0;j<=B;j++){XB[j]=1000.;YB[j]=1000.;ZB[j]=1000.;PROT_FLAG_B[j]=0;}
+  for(int j=0;j<500;j++){npart_x[j]=1000.;npart_y[j]=1000.;}
+  for(int j=0;j<10000;j++){ncoll_x[j]=1000.;ncoll_y[j]=1000.;}
   
-  for(int j=0;j<500;j++){npart_x_of_A[j]=0.0;npart_y_of_A[j]=0.0;}
-  for(int j=0;j<500;j++){npart_x_of_B[j]=0.0;npart_y_of_B[j]=0.0;}
+  for(int j=0;j<500;j++){npart_x_of_A[j]=1000.;npart_y_of_A[j]=1000.;}
+  for(int j=0;j<500;j++){npart_x_of_B[j]=1000.;npart_y_of_B[j]=1000.;}
 
-  shift_xavg_of_nucleons = 0. ;   
-  shift_yavg_of_nucleons = 0. ;   
+  for(int j=0;j<500;j++){spec_x_of_A[j]=1000.;spec_y_of_A[j]=1000.;spec_proton_flags_of_A[j]=0;}
+  for(int j=0;j<500;j++){spec_x_of_B[j]=1000.;spec_y_of_B[j]=1000.;spec_proton_flags_of_B[j]=0;}
+
   
   //generate orientation angles of target & projectile ...
   double p_ori_theta = f2->GetRandom(0.0,TMath::Pi());  
@@ -59,8 +63,8 @@ void mc_glau::event(int flag_for_eccentricity_calculation)
   //cout<<"[Info] (target orientation) t_theta: "<<t_ori_theta<<" t_phi: "<<t_ori_phi<<endl;
   
   //generate nucleus
-  generate_nucleus(XA,YA,ZA,A,p_radius,p_dlt,p_beta2,p_beta4,p_ori_theta,p_ori_phi);
-  generate_nucleus(XB,YB,ZB,B,t_radius,t_dlt,t_beta2,t_beta4,t_ori_theta,t_ori_phi);
+  generate_nucleus(XA,YA,ZA,PROT_FLAG_A,A,AZ,p_radius,p_dlt,p_beta2,p_beta4,p_ori_theta,p_ori_phi);
+  generate_nucleus(XB,YB,ZB,PROT_FLAG_B,B,BZ,t_radius,t_dlt,t_beta2,t_beta4,t_ori_theta,t_ori_phi);
   
   // generate impact parameter between bmin-bmax ...
   double b=f1->GetRandom(bmin,bmax); 
@@ -81,7 +85,7 @@ void mc_glau::event(int flag_for_eccentricity_calculation)
   
   
   // calculating npart & ncoll ...
-  calculate_npart_ncoll(XA,YA,XB,YB,NPART,NCOLL,npart_x,npart_y,ncoll_x, ncoll_y);                    
+  calculate_npart_ncoll(XA,YA,PROT_FLAG_A,XB,YB,PROT_FLAG_B,NPART,NCOLL,npart_x,npart_y,ncoll_x, ncoll_y);                    
   //cout<<"[Info] No. of participants : "<<NPART<<endl;
   //cout<<"[Info] No. of binary collisions : "<<NCOLL<<endl;
   
@@ -106,7 +110,7 @@ void mc_glau::event(int flag_for_eccentricity_calculation)
 }
 
 
-void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int A,
+void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int* PROT_FLAG_, int A, int ATOMIC_NO,
 			       double R, double dlt, double BETA2, double BETA4, double etaA, double psiA)
 {    
   double X[500];double Y[500];double Z[500];
@@ -129,12 +133,16 @@ void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int A,
 	 (30*TMath::Power(TMath::Cos(Theta),2))+3);
       double RAT= R*(1+(BETA2*Y20)+(BETA4*Y40));
       double rho=(1.0/60.0)*(r*r*(TMath::Sin(Theta)))/(1.0+(TMath::Exp((r-RAT)/dlt)));
-      
+
+      if(rho>1.0){
+        std::cout << "[generate nucleus func in MC] : nuclear" <<
+            " density (rho) > 1 => Not normalized ..." << std::endl;
+        exit(1);
+      }
       
       if(test < rho )
 	{      
-	  
-	  X[count]= (r*TMath::Sin(Theta)*TMath::Cos(Phi));
+	  X[count]=(r*TMath::Sin(Theta)*TMath::Cos(Phi));
 	  Y[count]=(r*TMath::Sin(Theta)*TMath::Sin(Phi));
 	  Z[count]=(r*TMath::Cos(Theta));
 	  CMx=CMx+X[count]; CMy=CMy+Y[count] ;CMz=CMz+Z[count];    
@@ -156,6 +164,41 @@ void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int A,
       Y1[j]=(TMath::Sin(psiA)*TMath::Cos(etaA)*X[j])+(TMath::Cos(psiA)*Y[j])+(-TMath::Sin(psiA)*TMath::Sin(etaA)*Z[j]);
       Z1[j]=(TMath::Sin(etaA)*X[j])+(TMath::Cos(etaA)*Z[j]);
     }
+
+
+  // set proton flag to each nucleon //
+  /*
+  int prot_counter = 0 ; 
+  double random_ ; 
+  do{
+   for(int ii=0;ii<A;ii++){
+     if(prot_counter<ATOMIC_NO){
+       random_ = tr2->Rndm();
+       if(random_<0.5 && PROT_FLAG[ii]==0){
+         PROT_FLAG[ii] =1 ; 
+         prot_counter +=1;
+       }
+     }
+   }
+  }while(prot_counter<ATOMIC_NO);
+
+  if(prot_counter==ATOMIC_NO){
+    // 
+  }
+  else{
+    std::cout << "Desired amount of proton flag are" 
+          << "not assigned to nucleons ..." << std::endl ;  
+    exit(1);
+  }
+  */
+
+  // Sandeep suggested to assign first Z(atomic no.) nucleons as protons.
+  // 23rd oct. 2023 
+  for(int ii=0;ii<ATOMIC_NO;ii++){
+    PROT_FLAG_[ii] = 1 ; 
+  }
+
+
 }
 
 
@@ -172,8 +215,12 @@ void mc_glau::shift_nucleus(double* X1, double* Y1, double* Z1,int A, double b,
 
 
 
-// this function calculates N_{part} & N_{coll}
-void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* vyB, int &Npart, 
+// This function calculates N_{part} & N_{coll}.
+// [Important] This function is only correct if we want to deposit energy according to two-component Glauber model.
+// In this function, the participant and binary collsion sources are shifted by a vector (xaverage, yaverage) in 
+// the transverse plane in such a way that the centre of mass of the energy profile remains in (x=0,y=0). 
+// The spectator sources are also shifted by the same amount.
+void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,int* pflagA, double* vxB,double* vyB, int* pflagB, int &Npart, 
 				    int &Ncoll, double* Npart_x, double* Npart_y, double* Ncoll_x, double* Ncoll_y)
 {
   
@@ -183,10 +230,8 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
   Nparticipants_from_B = 0 ; 
 
 
-  double occA[1000];
-  double occB[1000];         //flag during calc of Npart
-  //double Ncoll_x[2000]; double Ncoll_y[2000];  // x & y co-ordinate of binary collision sources
-  //double Npart_x[1000]; double Npart_y[1000];  // x & y co-ordinate of participant sources
+  int occA[1000];
+  int occB[1000];         //flag during calc of Npart
     
   for(int i=0;i<A;i++){
     occA[i]=0;
@@ -206,9 +251,8 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
 	  Ncoll_y[Ncoll]=(vyA[i]+vyB[j])/2;
 	  Ncoll=Ncoll+1;
 	  
-	  if(occA[i]==0){
+	  if(occA[i]==0){ 
 	    occA[i]=1;
-            npart_tag_A[i] = 1 ; 
 	    Npart_x[Npart]=vxA[i];
 	    Npart_y[Npart]=vyA[i];
 	    Npart=Npart+1;
@@ -218,7 +262,6 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
 	  } 
 	  if(occB[j]==0){
 	    occB[j]=1;
-            npart_tag_B[j] = 1 ; 
 	    Npart_x[Npart]=vxB[j];
 	    Npart_y[Npart]=vyB[j];
 	    Npart=Npart+1;
@@ -229,8 +272,34 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
 	  
 	}                                                           
       }                                                          
-  }                                                         
-  // [Info]  shifting the energy distributions center to (0,0,0)   
+  } 
+
+  // determine the spectator positions //
+  spectators_from_A = 0 ; 
+  spectators_from_B = 0 ;
+  // spectators from A 
+  for(int ii=0; ii<A; ii++){
+    if(occA[ii]>0){
+       continue ;
+    }
+    spec_x_of_A[spectators_from_A] = vxA[ii] ;   
+    spec_y_of_A[spectators_from_A] = vyA[ii] ;   
+    spec_proton_flags_of_A[spectators_from_A] = pflagA[ii] ;   
+    spectators_from_A += 1 ; 
+  }
+  // spectators from B
+  for(int jj=0; jj<B; jj++){
+    if(occB[jj]>0){
+       continue ;
+    }
+    spec_x_of_B[spectators_from_B] = vxB[jj] ;   
+    spec_y_of_B[spectators_from_B] = vyB[jj] ;  
+    spec_proton_flags_of_B[spectators_from_B] = pflagB[jj] ;    
+    spectators_from_B += 1 ; 
+  }
+
+                                                        
+  // [Info]  shifting the energy distributions center to (0,0) //   
   double xref1=0.0;
   double yref1=0.0;
   double wref1=0.0;
@@ -254,6 +323,7 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
   
   // cout<<xAverage<<"  "<<yAverage<<"\n";
   
+  // shift all the Npart, Ncoll and spectator sources by (xAverage,yAverage) //
   for(int k=0;k<Npart;k++){ 
     Npart_x[k] = Npart_x[k]-xAverage;
     Npart_y[k] = Npart_y[k]-yAverage;
@@ -270,10 +340,15 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
     npart_x_of_B[k] = npart_x_of_B[k]-xAverage;
     npart_y_of_B[k] = npart_y_of_B[k]-yAverage;
   }
+  for(int ii=0;ii<spectators_from_A;ii++){ 
+    spec_x_of_A[ii] = spec_x_of_A[ii]-xAverage;
+    spec_y_of_A[ii] = spec_y_of_A[ii]-yAverage;
+  }
+  for(int jj=0;jj<spectators_from_B;jj++){ 
+    spec_x_of_B[jj] = spec_x_of_B[jj]-xAverage;
+    spec_y_of_B[jj] = spec_y_of_B[jj]-yAverage;
+  }
 
-  shift_xavg_of_nucleons = xAverage ;   
-  shift_yavg_of_nucleons = yAverage ;   
-  
 }
 
 
@@ -369,39 +444,28 @@ void mc_glau::calculate_eccentricity(int Norder, int aN_part,int aN_coll,double 
 
 
 
-void mc_glau::get_nucleus_A(double *X1, double *Y1, double* Z1)
+void mc_glau::get_nucleus_A(double *X1, double *Y1, double* Z1, int* PFLAG)
 {
   for(int j=0;j<A;j++){
     X1[j]=XA[j]; 
     Y1[j]=YA[j];
     Z1[j]=ZA[j];
+    PFLAG[j]=PROT_FLAG_A[j];
   }
 }
 
 
 
-void mc_glau::get_nucleus_B(double *X1, double *Y1, double* Z1)
+void mc_glau::get_nucleus_B(double *X1, double *Y1, double* Z1, int* PFLAG)
 {
   for(int j=0;j<B;j++){
     X1[j]=XB[j];
     Y1[j]=YB[j]; 
     Z1[j]=ZB[j]; 
+    PFLAG[j]=PROT_FLAG_B[j];
   }
 }
 
-
-void mc_glau::get_npart_tag_in_nucleus_A(int *xx){
-  for(int j=0;j<A;j++){
-    xx[j] = npart_tag_A[j] ; 
-  }
-}
-
-
-void mc_glau::get_npart_tag_in_nucleus_B(int *xx){
-  for(int j=0;j<B;j++){
-    xx[j] = npart_tag_B[j] ; 
-  }
-}
 
 
 

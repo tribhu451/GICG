@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-#include <sstream>
 #include "TFile.h"
 #include "TTree.h"
 #include "input_data.h"
@@ -15,7 +14,6 @@
 using std::cout;
 using std::endl;
 using std::to_string;
-using std::istringstream;
 
 
 int main(int argc, char **argv)
@@ -39,9 +37,10 @@ int main(int argc, char **argv)
 
 
   cout << "\n\n" << endl ;
-  cout<<"      *********************************************************************     "<<endl;
-  cout<<"      *          GCIG(Glauber-type Initial Condition Generator)           *     "<<endl;
-  cout<<"      *********************************************************************     "<<endl;
+  cout<<"      *******************************************************************************     "<<endl;
+  cout<<"      *          GCIG(Glauber-type Initial Condition Generator) v 0.0.0.2           *     "<<endl;
+  cout<<"      *       Calculation of event averaged EM filed profile from spectators        *     "<<endl;
+  cout<<"      *******************************************************************************     "<<endl;
   cout << "\n\n" << endl ;
 
   cout<<"Total no of events : "<<event_no<<endl;  
@@ -53,27 +52,8 @@ int main(int argc, char **argv)
   rapidity_extension* RE = new rapidity_extension(&InData); 
  
   // ********** uncomment to perform jobs as per your requirement. ********** //
-  //JOB->event_by_event_mc_glauber_for_centrality_determination(event_no);
-  //JOB->event_by_event_mc_glauber_and_eccentricity_calculation(event_no);
-  //JOB->event_by_event_idnni_for_centrality_determination(event_no);
-  //JOB->event_by_event_idnni_and_eccentricity_calculation(event_no);
-  //JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_idnni(event_no);
-  //JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_mc_glauber(event_no); 
-  //RE ->write_rapidity_extended_tilted_profile_from_idnni_boost_invariant_deposition(0,0,"xx"); // nb flag, external file flag, external file name ;
+  JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_mc_glauber(event_no); 
   //RE ->write_rapidity_extended_tilted_profile_from_mc_glauber_boost_invariant_deposition(1,0,"xx"); // nb flag, external file flag, external file name ;
-  //RE ->write_rapidity_extended_energy_momentum_conserving_SARJ_profile_from_mc_glauber_boost_invariant_deposition(1,0,"xx"); 
-  //RE ->write_rapidity_extended_Bjorken_flow_breaking_tilted_profile_from_mc_glauber_boost_invariant_deposition(1,0,"xx"); 
-
-  JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_ebe_mc_glauber_events(event_no);
-
-  for (int ii=0; ii<event_no; ii++){
-    std::stringstream filename;
-    filename.str("");
-    filename << "output/mc_glauber_boost_invariant_event_averaged_profile_for_rapidity_extension_" << ii ;
-    filename << ".dat";
-    RE ->write_rapidity_extended_tilted_profile_from_mc_glauber_boost_invariant_deposition(1,1,filename.str().c_str(),ii); 
-          // nb flag, external file flag, external file name ;
-  }
 
   delete MC ;
   delete arena ;

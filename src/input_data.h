@@ -51,6 +51,18 @@ typedef struct input_data
   double iiserbpr_ra_type_2_etal ; 
   double iiserbpr_ra_type_2_right_fall ; 
  
+
+  double EMtaumax  ; 
+  double EMetasmax  ; 
+  double EMxmax ; 
+  double EMymax ; 
+
+  int EMntau ; 
+  int EMnetas ; 
+  int EMnx ; 
+  int EMny ;
+
+  double EMsigma ; 
     
 }InputData;
 

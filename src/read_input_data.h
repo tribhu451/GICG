@@ -44,7 +44,6 @@ void read_input_data_(InputData *input_parameter_list, string input_file_name)
       if(a_ == "projectile" )    {input_parameter_list->projectile = a;}
       if(a_ == "target" )    {input_parameter_list->target = a;}
       if(a_ == "SNN" )    {input_parameter_list->SNN = atof(a);}
- 
       
       if(a_ == "bmin" )  {input_parameter_list->bmin = atof(a);}       
       if(a_ == "bmax" )  {input_parameter_list->bmax = atof(a);}  
@@ -85,6 +84,19 @@ void read_input_data_(InputData *input_parameter_list, string input_file_name)
       if(a_ == "iiserbpr_ra_type_2_etal" ) {input_parameter_list->iiserbpr_ra_type_2_etal = atof(a);} 
       if(a_ == "iiserbpr_ra_type_2_right_fall" ) {input_parameter_list->iiserbpr_ra_type_2_right_fall = atof(a);} 
 
+   
+      // EM field profile
+      if(a_ == "EMtaumax" ) {input_parameter_list->EMtaumax = atof(a);} 
+      if(a_ == "EMetasmax" ) {input_parameter_list->EMetasmax = atof(a);} 
+      if(a_ == "EMxmax" ) {input_parameter_list->EMxmax = atof(a);} 
+      if(a_ == "EMymax" ) {input_parameter_list->EMymax = atof(a);} 
+
+      if(a_ == "EMntau" ) {input_parameter_list->EMntau = atof(a);} 
+      if(a_ == "EMnetas" ) {input_parameter_list->EMnetas = atof(a);} 
+      if(a_ == "EMnx" ) {input_parameter_list->EMnx = atof(a);} 
+      if(a_ == "EMny" ) {input_parameter_list->EMny = atof(a);} 
+
+      if(a_ == "EMsigma" ) {input_parameter_list->EMsigma = atof(a);} 
 
       delete iss;
       number++;
@@ -96,4 +108,11 @@ void read_input_data_(InputData *input_parameter_list, string input_file_name)
 
  
 };//class end
+
+
+
+
+
+
+
 

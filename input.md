@@ -11,15 +11,15 @@ mode 1
 
 #collision energy
 #[Info] in GeV
-SNN 200.0
+SNN 2760.0
 
 
 #collision species & impact parameter
 #[Info] species can be (Au,U,Pb,p) 
-projectile Au2
-target Au2
-bmin  6.0001
-bmax  6.0002
+projectile Pb
+target Pb
+bmin  7.0001
+bmax  7.0002
 
 # Two component MC Glauber parametrs
 npp 1.0
@@ -60,6 +60,17 @@ iiserbpr_ra_type_2_peak  4.0
 iiserbpr_ra_type_2_etal  1.0
 iiserbpr_ra_type_2_right_fall  0.6
 
+EMtaumax  2 
+EMetasmax  8 
+EMxmax  10
+EMymax  10
+
+EMntau 40 
+EMnetas  11
+EMnx  11
+EMny 11
+
+EMsigma 0.023
 
 
 # :: END :: #
