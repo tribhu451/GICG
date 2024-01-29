@@ -129,7 +129,12 @@ void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int A,
 	 (30*TMath::Power(TMath::Cos(Theta),2))+3);
       double RAT= R*(1+(BETA2*Y20)+(BETA4*Y40));
       double rho=(1.0/60.0)*(r*r*(TMath::Sin(Theta)))/(1.0+(TMath::Exp((r-RAT)/dlt)));
-      
+      if( rho < 0 || rho > 1){
+	 std::cout << "Problem in aaceptance rejection method" << std::endl ; 
+         std::cout << " during generation of nuclues ..." << std::endl ; 
+	 std::cout << "rho < 0 || rho > 1 :  rho = " << rho << " ..."<< std::endl ; 
+	 exit(1);
+      }      
       
       if(test < rho )
 	{      
