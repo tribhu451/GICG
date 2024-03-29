@@ -474,6 +474,7 @@ void rapidity_extension::write_rapidity_extended_energy_momentum_conserving_SARJ
   int    ny ; 
   double dx ; 
   double dy ; 
+  double net_deposited_baryon = 0 ; 
 
   std::cout << "eta_plateau = " << eta_plateau << std::endl ; 
   std::cout << "eta_fall    = " << eta_fall << std::endl ; 
@@ -558,30 +559,33 @@ void rapidity_extension::write_rapidity_extended_energy_momentum_conserving_SARJ
   cout << "Extending in rapidity ... " << endl ; 
   cout << "neta = " << neta << endl ; 
   cout << "deta = " << deta << endl ; 
+
+
   if(flag_nb > 0){
     cout << "Non zero baryon density inside the fluid." << endl ;
     if(iparams->baryon_rapidity_profile_type == 1){
       cout << "Baryon rapidty profile type is taken as in arXiv-1804.10557 ... " << endl ;
-    }  
-    if(iparams->baryon_rapidity_profile_type == 2){
-      cout << "Baryon rapidty profile type : iiserbpr quadratic ansatz-2 ... " << endl ;
+      cout << "This functions generates exact the same IC proposed in aXiv:2106.08125. " << endl ; 
+      cout << "Hence, it does not contain two component baryon deposition.  " << endl ; 
+      cout << "The initial baryon profile in this case is only depend on participant densities.  " << endl ; 
     }  
   }
 
   double baryon_profile_normalisation = 0. ;
   double baryon_envelope_a            = 0. ; 
-  double baryon_envelope_b            = 0. ;  
-  double net_deposited_baryon         = 0. ;
+  double baryon_envelope_b            = 0. ; 
 
-  if(iparams->baryon_rapidity_profile_type == 1 ){
-    baryon_profile_normalisation = 1. / ( integrate_baryon_density_eta_envelop_profile_arxiv_1804_10557_over_eta()  ) ;
-  }
-  else if(iparams->baryon_rapidity_profile_type == 2){
-    baryon_profile_normalisation = 1. / ( integrate_baryon_density_eta_envelop_profile_arxiv_1804_10557_over_eta()  ) ;
-  }
-  else{
-     std::cout << "Baryon rapidity profile type " << iparams->baryon_rapidity_profile_type << " doesn't exist." << std::endl ; 
-     exit(1);
+
+  if(flag_nb > 0){
+    if(iparams->baryon_rapidity_profile_type == 1 ){
+      double baryon_weight_temp = ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * ( npart_of_a + npart_of_b ); 
+      baryon_profile_normalisation = ( npart_of_a + npart_of_b ) 
+                                   / ( integrate_baryon_density_eta_envelop_profile_arxiv_1804_10557_over_eta() * baryon_weight_temp ) ;
+    }
+    else{
+       std::cout << "Baryon rapidity profile type " << iparams->baryon_rapidity_profile_type << " doesn't exist." << std::endl ; 
+       exit(1);
+    }
   }
 
 
@@ -593,8 +597,6 @@ void rapidity_extension::write_rapidity_extended_energy_momentum_conserving_SARJ
     double eta = -eta_max + deta * ieta ; 
     cout << "ieta : " << ieta << "  eta : " << eta << endl ; 
 
-
-
     if(flag_nb > 0 && iparams->baryon_rapidity_profile_type == 1 ){
        baryon_envelope_a =  baryon_density_eta_envelop_profile_arxiv_1804_10557(eta, 
               iparams->baryon_rapidity_profile_eta_peak, iparams->baryon_rapidity_profile_sigma_eta_plus, 
@@ -603,17 +605,6 @@ void rapidity_extension::write_rapidity_extended_energy_momentum_conserving_SARJ
               -iparams->baryon_rapidity_profile_eta_peak, iparams->baryon_rapidity_profile_sigma_eta_minus, 
                   iparams->baryon_rapidity_profile_sigma_eta_plus ) ; 
     }
-
-  
-    if(flag_nb > 0 && iparams->baryon_rapidity_profile_type == 2 ){
-       baryon_envelope_a =  baryon_density_eta_envelop_profile_iiserbpr_type_2(eta, 
-              iparams->iiserbpr_ra_type_2_peak, iparams->iiserbpr_ra_type_2_etal, 
-                  iparams->iiserbpr_ra_type_2_right_fall ) ; 
-       baryon_envelope_b = baryon_density_eta_envelop_profile_iiserbpr_type_2(-eta, 
-               iparams->iiserbpr_ra_type_2_peak, iparams->iiserbpr_ra_type_2_etal, 
-                  iparams->iiserbpr_ra_type_2_right_fall ) ; 
-    }
- 
 
 
     for(int ix = 0 ; ix < nx ; ix++ ){
@@ -626,13 +617,13 @@ void rapidity_extension::write_rapidity_extended_energy_momentum_conserving_SARJ
 
         // baryon profile
         double baryon_density  = 0. ;
-        if(flag_nb > 0 ){
+        if(flag_nb > 0 && iparams->baryon_rapidity_profile_type < 3 ){
           baryon_density += baryon_envelope_a * ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * npart_a[ix][iy] ;
           baryon_density += baryon_envelope_b * ( 1 - iparams->two_component_baryon_deposition_parameter_omega ) * npart_b[ix][iy] ;
           baryon_density *= baryon_profile_normalisation ; 
           baryon_density /= ( dx * dy ) ;
         }
-   
+
         double strange_density = 0. ;
         double charge_density  = 0. ;
         net_deposited_baryon += baryon_density * deta * dx * dy  ;
