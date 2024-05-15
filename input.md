@@ -18,8 +18,8 @@ SNN 200.0
 #[Info] species can be (Au,U,Pb,p) 
 projectile Au2
 target Au2
-bmin  6.0001
-bmax  6.0002
+bmin  0.0001
+bmax  15.0002
 
 # Two component MC Glauber parametrs
 npp 1.0
@@ -27,6 +27,8 @@ xhard 0.14
 
 #minimum bias run root output file name, required for centrality determination.
 root_output_file_name    output/Au_Au_200_min_bias_idnni_nx_201.root
+
+
 
 
 #Grid, smearing and event averaged profile parameters
