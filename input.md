@@ -39,37 +39,6 @@ upper_mult_proxy_cut  10000000.00
 lower_mult_proxy_cut  0.000
 
 
-#rapidity extension
-etamax 8
-neta   81
-matter_eta_plateau 1.3
-matter_eta_fall  1.5
-matter_tilt_param  2.5
-SARJ_model_f_param 0.25
-init_time_tau0 0.8 
-
-baryon_rapidity_profile_type 2
-
-two_component_baryon_deposition_parameter_omega  0.1
-
-baryon_rapidity_profile_eta_peak  4.0
-baryon_rapidity_profile_sigma_eta_plus  0.6
-baryon_rapidity_profile_sigma_eta_minus  0.8
-
-iiserbpr_ra_type_2_peak  4.0
-iiserbpr_ra_type_2_etal  1.0
-iiserbpr_ra_type_2_right_fall  0.6
-
-EMtaumax  2 
-EMetasmax  8 
-EMxmax  10
-EMymax  10
-
-EMntau 40 
-EMnetas  11
-EMnx  11
-EMny 11
-
 EMsigma 0.023
 
 

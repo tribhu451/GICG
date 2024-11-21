@@ -246,38 +246,29 @@ void smear_spec_ch::write_event_averaged_spectator_charge_profile_to_file_after_
 }
 
 
-
-void smear_spec_ch::write_EM_field_from_event_averaged_spectator_charge_profile_to_file_assuming_symmetry(int nEvents, int index){
+// This function calculates the tau evolution of eBy filed only for symmetric collsion
+// It calculates the eBy value at (etas=0,x=0,y=0) for different tau
+// This is kept here only for test purpose
+// The test is that, whether the spectator density is generated properly or not ?
+void smear_spec_ch::write_eBy_at_000_from_event_averaged_spectator_charge_profile_to_file_assuming_symmetry(int nEvents, int index){
   
   // Compare the strings
   if (inparams->projectile != inparams->target ) {
       std::cout << "projectile and target nuclei are not the same." 
        << "Not good to assume symmetry. Exiting the function ... "  
        << std::endl;
-      return 1; 
+      return ; 
   } else {
     std::cout << "calculating EM filed assuming symmetry" 
     <<" and storing in file ..." << std::endl ; 
   }
 
   double Yb = get_beam_rapidity() ;
-  double tau_max = inparams->EMtaumax ;  
-  double etas_max = inparams->EMetasmax ; 
-  double x_max = inparams->EMxmax; 
-  double y_max = inparams->EMymax; 
-  
-  int ntau = inparams->EMntau ; 
-  int netas = inparams->EMnetas ; 
-  int nxx = inparams->EMnx ; 
-  int nyy = inparams->EMny ;
-  
+  double tau_max = 2. ;  
   double tau_min = 0.01 ;  
+  double ntau = 40 ; 
   
   double dtau = ( tau_max - tau_min ) / ( ntau ) ;
-  double detas = ( 2 * etas_max ) / ( netas - 1 ) ;
-  double dxx = ( 2 * x_max ) / ( nxx - 1 ) ;
-  double dyy = ( 2 * y_max ) / ( nyy - 1 ) ;
-  
   double emsigma = inparams->EMsigma ; 
 
   int MaxContributor = ( arena->get_nx() / 2 ) 
@@ -332,26 +323,18 @@ void smear_spec_ch::write_EM_field_from_event_averaged_spectator_charge_profile_
   std::ofstream out_file;
   std::stringstream output_filename;
   output_filename.str("");
-  output_filename << "output/EM_field_profile_from_charge_distribution_" ; 
+  output_filename << "output/EM_field_eBy_evo_w_tau_at_000_from_charge_distribution_" ; 
   output_filename << "of_spectators_assuming_spectators_symmetry_emsigma_" ; 
   output_filename << emsigma << "_"  << index  ;
   output_filename << ".dat";
   out_file.open(output_filename.str().c_str(), std::ios::out);
-  out_file <<"#"<<"\t"<<"EM_field_profile_w_spectator_symmetry"<<"\t"<<"1"<<"\t"
-	   <<"EMnetas="<<"\t"<<netas<<"\t"<<"EMnx=" <<"\t"<<nxx<<"\t"<<"EMny="
-	   <<"\t"<<nyy <<"\t"<<"EMdeta="<<"\t"<< detas <<"\t"<<"EMdx="<<"\t"
-	   <<dxx<<"\t"<<"EMdy="<<"\t"<<dyy<<endl;
+  out_file <<"#"<<"\t"<<"By_field_evo_w_spectator_symmetry"<< "   tau(fm)    eBy(fm^{-2})" << std::endl ; 
 
   for(int itau = 0 ; itau < ntau ; itau++ ){
-   // std::cout << "itau = " << itau << "  tau = " 
-     //   << (tau_min + itau * dtau) << std::endl ; 
-    for(int ietas = 0 ; ietas < netas ; ietas++ ){
-      for(int ixx = 0 ; ixx < nxx ; ixx++ ){
-	for(int iyy = 0 ; iyy < nyy ; iyy++ ){
 	  double grid_tau = tau_min + itau * dtau ; 
-	  double grid_etas = -etas_max + ietas * detas ; // eta
-	  double grid_x = -x_max + ixx * dxx ; // x
-	  double grid_y = -y_max + iyy * dyy ; // y
+	  double grid_etas = 0 ; // eta
+	  double grid_x = 0 ; // x
+	  double grid_y = 0 ; // y
 	  
 	  // contribution from projectile spectators
           double By = 0 ; 
@@ -366,15 +349,11 @@ void smear_spec_ch::write_EM_field_from_event_averaged_spectator_charge_profile_
 	      By += get_By(trgt_contributor_charge[ii],grid_tau,grid_etas,
                       grid_x,grid_y,trgt_contributor_x[ii],trgt_contributor_y[ii],-Yb,emsigma) ; 
           }
-	  
-          if( ( fabs(grid_x)<0.001 &&  fabs(grid_y)<0.001 ) && fabs(grid_etas)<0.001 ){
-            std::cout << "tau = " << grid_tau <<"  By = " << By << "  Nproj = " << Ncontributor_from_proj_spec<< std::endl ; 
-	    out_file << grid_tau << "  "  << grid_etas << "  " << grid_x << "  " << grid_y << "  " << By  << std::endl ;
-          }
- 
-	} // iyy loop
-      } // ixxx loop
-    } // ietas loop
+	 
+          std::cout << "tau = " << grid_tau <<"  By = " << By << std::endl ; 
+	  out_file << grid_tau << "  " << By  << std::endl ;
+          
+
   } // itau loop
   out_file.close() ; 
   

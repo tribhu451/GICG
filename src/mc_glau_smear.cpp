@@ -336,7 +336,7 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
 void mc_glau_smear::calculate_and_write_EM_field_profile_to_file(int nEvents, int event_index){
   specsm->write_event_averaged_spectator_charge_profile_to_file_after_gaussian_smearing(nEvents,event_index);
   specsm->write_event_averaged_spectator_charge_profile_to_file_after_gaussian_smearing_with_symmetry(nEvents,event_index);
-  specsm->write_EM_field_from_event_averaged_spectator_charge_profile_to_file_assuming_symmetry(nEvents,event_index);
+  specsm->write_eBy_at_000_from_event_averaged_spectator_charge_profile_to_file_assuming_symmetry(nEvents,event_index);
 }
 
 

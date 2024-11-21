@@ -19,7 +19,7 @@ class smear_spec_ch {
     void write_event_averaged_spectator_charge_profile_to_file_after_gaussian_smearing_with_symmetry
          (int nEvents, int event_index);
     void reset_spectator_charge_contribution_from_all_events_to_zero_on_the_cells();
-    void write_EM_field_from_event_averaged_spectator_charge_profile_to_file_assuming_symmetry(int nEvents, int index);
+    void write_eBy_at_000_from_event_averaged_spectator_charge_profile_to_file_assuming_symmetry(int nEvents, int index);
 
   private :
     mc_glau* mc;
