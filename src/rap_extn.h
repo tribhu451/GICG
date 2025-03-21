@@ -40,7 +40,8 @@ class rapidity_extension{
         double rapidity_asymmetry_ansatz_for_tilt_by_Bozek(double etas, double etam);
         int theta(double );
         double baryon_density_eta_envelop_profile_arxiv_1804_10557(double eta, double eta0_nb, double sigma_eta_nb_plus, double sigma_eta_nb_minus ) ; 
-        double baryon_density_eta_envelop_profile_arxiv_1804_10557_function(double* x, double* p) ; 
+        //double baryon_density_eta_envelop_profile_arxiv_1804_10557_function(double* x, double* p) ; 
+        double baryon_density_eta_envelop_profile_arxiv_1804_10557_function(double x, double, double, double) ;
         double integrate_baryon_density_eta_envelop_profile_arxiv_1804_10557_over_eta() ;
 
         // IISER Berhampur baryon rapidity ansatz-2 //

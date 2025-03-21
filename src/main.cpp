@@ -53,14 +53,14 @@ int main(int argc, char **argv)
   rapidity_extension* RE = new rapidity_extension(&InData); 
  
   // ********** uncomment to perform jobs as per your requirement. ********** //
-  JOB->event_by_event_mc_glauber_for_centrality_determination(event_no);
+  //JOB->event_by_event_mc_glauber_for_centrality_determination(event_no);
   //JOB->event_by_event_mc_glauber_and_eccentricity_calculation(event_no);
   //JOB->event_by_event_idnni_for_centrality_determination(event_no);
   //JOB->event_by_event_idnni_and_eccentricity_calculation(event_no);
   //JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_idnni(event_no);
-  //JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_mc_glauber(event_no); 
+  JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_mc_glauber(event_no); 
   //RE ->write_rapidity_extended_tilted_profile_from_idnni_boost_invariant_deposition(0,0,"xx"); // nb flag, external file flag, external file name ;
-  //RE ->write_rapidity_extended_tilted_profile_from_mc_glauber_boost_invariant_deposition(1,0,"xx"); // nb flag, external file flag, external file name ;
+  RE ->write_rapidity_extended_tilted_profile_from_mc_glauber_boost_invariant_deposition(1,0,"xx",0); // nb flag, external file flag, external file name ;
   //RE ->write_rapidity_extended_energy_momentum_conserving_SARJ_profile_from_mc_glauber_boost_invariant_deposition(1,0,"xx"); 
   //RE ->write_rapidity_extended_Bjorken_flow_breaking_tilted_profile_from_mc_glauber_boost_invariant_deposition(1,0,"xx"); 
 

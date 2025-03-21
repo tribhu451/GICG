@@ -222,7 +222,7 @@ void rapidity_extension::write_rapidity_extended_tilted_profile_from_mc_glauber_
   }
   else{
     cout << "Reading the event averaged profile ..." << endl ;
-    std::string internal_file_name = "output/mc_glauber_boost_invariant_event_averaged_profile_for_rapidity_extension.dat" ; 
+    std::string internal_file_name = "output/mc_glauber_boost_invariant_event_averaged_profile_for_rapidity_extension_0.dat" ; 
     infile.open(internal_file_name.c_str());
     if (!infile){
       cout << "couldn't find the event averaged file." << endl;
@@ -947,6 +947,8 @@ double rapidity_extension::baryon_density_eta_envelop_profile_arxiv_1804_10557(d
 
 }
 
+
+/*
 double rapidity_extension::baryon_density_eta_envelop_profile_arxiv_1804_10557_function(double* x, double* p){ 
 // as taken in arxiv:1804.10557
   double eta_0_nb = iparams->baryon_rapidity_profile_eta_peak ;
@@ -965,6 +967,36 @@ double rapidity_extension::integrate_baryon_density_eta_envelop_profile_arxiv_18
   delete f1 ;
   return TA;
 }
+*/
+
+
+double rapidity_extension::baryon_density_eta_envelop_profile_arxiv_1804_10557_function(double x, double eta_0_nb, double sigma_eta_nb_plus, double sigma_eta_nb_minus) {
+    return (theta(x - eta_0_nb) * exp(-pow(eta_0_nb - x, 2) / (2 * pow(sigma_eta_nb_plus, 2))) +
+            theta(eta_0_nb - x) * exp(-pow(eta_0_nb - x, 2) / (2 * pow(sigma_eta_nb_minus, 2))));
+}
+
+double rapidity_extension::integrate_baryon_density_eta_envelop_profile_arxiv_1804_10557_over_eta(){
+  double eta_0_nb = iparams->baryon_rapidity_profile_eta_peak ;
+  double sigma_eta_nb_plus = iparams->baryon_rapidity_profile_sigma_eta_plus ;
+  double sigma_eta_nb_minus = iparams->baryon_rapidity_profile_sigma_eta_minus ;
+
+    int N = 200000 ;
+    double a = -10, b = 10;  // Integration limits
+    double h = (b - a) / N;  // Step size
+    double integral = 0.0;
+
+    for (int i = 0; i < N; i++) {
+        double x1 = a + i * h;
+        double x2 = a + (i + 1) * h;
+        integral += 0.5 * h * (baryon_density_eta_envelop_profile_arxiv_1804_10557_function(x1, eta_0_nb, sigma_eta_nb_plus, sigma_eta_nb_minus) +
+                               baryon_density_eta_envelop_profile_arxiv_1804_10557_function(x2, eta_0_nb, sigma_eta_nb_plus, sigma_eta_nb_minus));
+    }
+
+    return integral;
+}
+
+
+
 
 
 // ============================================================================
