@@ -10,17 +10,11 @@ mc_glau::mc_glau(InputData *InData1)
   InData = InData1; 
   set_mc_glau_params();
     
-  // Random number generators to be used in function event().
-  t1=new TRandom3();
-  t1->SetSeed(0);
-  long kss=t1->GetSeed();
-  gRandom->SetSeed(kss);
-  f1= new TF1("f1","x",0.0,25.0);
-  f2= new TF1("f2","sin(x)",0.0,TMath::Pi());
+  t1 = new random_gen();
+  tr1 = new random_gen();
+  f1 = new random_gen();
+  f2 = new random_gen();
   
-  // Random number generators to be used in function generate_nucleus().
-  tr1 = new TRandom3();
-  tr1->SetSeed(0);
 }
 
 mc_glau::~mc_glau()
@@ -51,10 +45,10 @@ void mc_glau::event(int flag_for_eccentricity_calculation)
   shift_yavg_of_nucleons = 0. ;   
   
   //generate orientation angles of target & projectile ...
-  double p_ori_theta = f2->GetRandom(0.0,TMath::Pi());  
-  double t_ori_theta = f2->GetRandom(0.0,TMath::Pi());  
-  double p_ori_phi = (2.0*TMath::Pi())*(t1->Rndm());
-  double t_ori_phi = (2.0*TMath::Pi())*(t1->Rndm());
+  double p_ori_theta = f2->random_sinx_0_to_pi();  
+  double t_ori_theta = f2->random_sinx_0_to_pi();  
+  double p_ori_phi = (2.0*M_PI)*(t1->rand_uniform());
+  double t_ori_phi = (2.0*M_PI)*(t1->rand_uniform());
   //cout<<"[Info] (projectile orientation) p_theta: "<<p_ori_theta<<" p_phi: "<<p_ori_phi<<endl;
   //cout<<"[Info] (target orientation) t_theta: "<<t_ori_theta<<" t_phi: "<<t_ori_phi<<endl;
   
@@ -63,14 +57,14 @@ void mc_glau::event(int flag_for_eccentricity_calculation)
   generate_nucleus(XB,YB,ZB,B,t_radius,t_dlt,t_beta2,t_beta4,t_ori_theta,t_ori_phi);
   
   // generate impact parameter between bmin-bmax ...
-  double b=f1->GetRandom(bmin,bmax); 
+  double b=f1->random_linear(bmin,bmax); 
   IMPACT_PARAM = b;                     
   //cout<<"[Info] b = "<<b<<" (fm)"<<endl;
   
   
   double zhi;
 #ifdef ROTATED_SHIFT
-  zhi=(2.0*TMath::Pi())*(t1->Rndm());
+  zhi=(2.0*M_PI)*(t1->Rndm());
 #else
   zhi =0.0;
 #endif
@@ -83,26 +77,7 @@ void mc_glau::event(int flag_for_eccentricity_calculation)
   // calculating npart & ncoll ...
   calculate_npart_ncoll(XA,YA,XB,YB,NPART,NCOLL,npart_x,npart_y,ncoll_x, ncoll_y);                    
   //cout<<"[Info] No. of participants : "<<NPART<<endl;
-  //cout<<"[Info] No. of binary collisions : "<<NCOLL<<endl;
-  
-  
-  // calculating eccentricity ...
-  if (flag_for_eccentricity_calculation > 0 ){
-    int Norder = 7 ;
-    double epspp[Norder];
-    double phipp[Norder];
-    for(int iorder = 0 ; iorder < Norder ; iorder++ ){
-      epspp[iorder] = 0. ; 
-      phipp[iorder] = 0. ; 
-    }
-      calculate_eccentricity(Norder,NPART,NCOLL,npart_x,npart_y,ncoll_x,ncoll_y,epspp,phipp);
-      for(int iorder = 0 ; iorder < Norder ; iorder++ ){
-        eccentricity[iorder] = epspp[iorder] ; 
-        PhiN[iorder]         = phipp[iorder] ; 
-      }
-
-  }
-  
+  //cout<<"[Info] No. of binary collisions : "<<NCOLL<<endl; 
 }
 
 
@@ -116,19 +91,19 @@ void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int A,
   
   do
     {
-      double r=(11.0)*(tr1->Rndm());
-      double Theta=(TMath::Pi())*(tr1->Rndm());
-      double Phi=((2.0)*TMath::Pi())*(tr1->Rndm());
-      double test=tr1->Rndm();
+      double r=(15.0)*(tr1->rand_uniform());
+      double Theta=(M_PI)*(tr1->rand_uniform());
+      double Phi=((2.0)*M_PI)*(tr1->rand_uniform());
+      double test=tr1->rand_uniform();
       
       
-      double Y20=0.25*TMath::Sqrt(5.0/TMath::Pi())*
-	(3*TMath::Cos(Theta)*TMath::Cos(Theta)-1.0);
-      double Y40=(3.0/(16.0*TMath::Sqrt(TMath::Pi())))* 
-	((35*TMath::Power(TMath::Cos(Theta),4))-
-	 (30*TMath::Power(TMath::Cos(Theta),2))+3);
+      double Y20=0.25*sqrt(5.0/M_PI)*
+	(3*cos(Theta)*cos(Theta)-1.0);
+      double Y40=(3.0/(16.0*sqrt(M_PI)))* 
+	((35*pow(cos(Theta),4))-
+	 (30*pow(cos(Theta),2))+3);
       double RAT= R*(1+(BETA2*Y20)+(BETA4*Y40));
-      double rho=(1.0/60.0)*(r*r*(TMath::Sin(Theta)))/(1.0+(TMath::Exp((r-RAT)/dlt)));
+      double rho=(1.0/60.0)*(r*r*(sin(Theta)))/(1.0+(exp((r-RAT)/dlt)));
       if( rho < 0 || rho > 1){
 	 std::cout << "Problem in aaceptance rejection method" << std::endl ; 
          std::cout << " during generation of nuclues ..." << std::endl ; 
@@ -139,9 +114,9 @@ void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int A,
       if(test < rho )
 	{      
 	  
-	  X[count]= (r*TMath::Sin(Theta)*TMath::Cos(Phi));
-	  Y[count]=(r*TMath::Sin(Theta)*TMath::Sin(Phi));
-	  Z[count]=(r*TMath::Cos(Theta));
+	  X[count]= (r*sin(Theta)*cos(Phi));
+	  Y[count]=(r*sin(Theta)*sin(Phi));
+	  Z[count]=(r*cos(Theta));
 	  CMx=CMx+X[count]; CMy=CMy+Y[count] ;CMz=CMz+Z[count];    
 	  count=count+1;
 	}   
@@ -157,9 +132,9 @@ void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int A,
   
   for(int j=0;j<A;j++)
     {
-      X1[j]=(TMath::Cos(psiA)*TMath::Cos(etaA)*X[j])+(-TMath::Sin(psiA)*Y[j])+(-TMath::Cos(psiA)*TMath::Sin(etaA)*Z[j]);
-      Y1[j]=(TMath::Sin(psiA)*TMath::Cos(etaA)*X[j])+(TMath::Cos(psiA)*Y[j])+(-TMath::Sin(psiA)*TMath::Sin(etaA)*Z[j]);
-      Z1[j]=(TMath::Sin(etaA)*X[j])+(TMath::Cos(etaA)*Z[j]);
+      X1[j]=(cos(psiA)*cos(etaA)*X[j])+(-sin(psiA)*Y[j])+(-cos(psiA)*sin(etaA)*Z[j]);
+      Y1[j]=(sin(psiA)*cos(etaA)*X[j])+(cos(psiA)*Y[j])+(-sin(psiA)*sin(etaA)*Z[j]);
+      Z1[j]=(sin(etaA)*X[j])+(cos(etaA)*Z[j]);
     }
 }
 
@@ -170,8 +145,8 @@ void mc_glau::shift_nucleus(double* X1, double* Y1, double* Z1,int A, double b,
 			    double zhi,double* X2, double* Y2, double* Z2 )
 {
   for(int j=0;j<A;j++){
-    X2[j]=X1[j]+((b)*TMath::Cos(zhi));
-    Y2[j]=Y1[j]+((b)*TMath::Sin(zhi));
+    X2[j]=X1[j]+((b)*cos(zhi));
+    Y2[j]=Y1[j]+((b)*sin(zhi));
   }
 }
 
@@ -202,9 +177,9 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
   
   for (int i=0; i<A; i++){
       for (int j=0; j<B; j++){  
-	double d=TMath::Sqrt( TMath::Power((vxB[j]-vxA[i]),2) + 
-			      TMath::Power ( (vyB[j]-vyA[i]),2));
-	double D=TMath::Sqrt( ( sigma ) / (  TMath::Pi() ) ); 
+	double d=sqrt( pow((vxB[j]-vxA[i]),2) + 
+			      pow ( (vyB[j]-vyA[i]),2));
+	double D=sqrt( ( sigma ) / (  M_PI ) ); 
 	
 	if( d <= D){ 
 	  Ncoll_x[Ncoll]=(vxA[i]+vxB[j])/2;
@@ -278,97 +253,6 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
 
   shift_xavg_of_nucleons = xAverage ;   
   shift_yavg_of_nucleons = yAverage ;   
-  
-}
-
-
-// This function calculates eccentricity and participant plane angle
-void mc_glau::calculate_eccentricity(int Norder, int aN_part,int aN_coll,double *Npart_x,
-				     double *Npart_y,double *Ncoll_x,double *Ncoll_y,double* eps, double* psi)
-{
-  
-  for(int i=0; i<Norder; i++){
-    eps[i] = 0.0;
-    psi[i] = 0.0;
-  }
-  
-  int Total_Nch=aN_part+aN_coll;
-  double Nch_r[Total_Nch];
-  double Nch_phi[Total_Nch];
-  double Nch_value[Total_Nch];
-  
-  double Npart_r[aN_part];
-  double Npart_phi[aN_part];
-  
-  double Ncoll_r[aN_coll];
-  double Ncoll_phi[aN_coll];
-  
-  double Ra,Theta;
-  
-  for(int k=0;k<aN_part;k++){ 
-    Ra= TMath::Sqrt( TMath::Power(Npart_x[k],2)+TMath::Power( Npart_y[k],2) );
-    Theta =(TMath::ATan2(Npart_y[k],Npart_x[k]));
-    Npart_r[k]=Ra;
-    Npart_phi[k]=Theta;
-  }
-  for(int k=0;k<aN_coll;k++){      
-    Ra=TMath::Sqrt( TMath::Power(Ncoll_x[k],2)+ TMath::Power(Ncoll_y[k],2));
-    Theta=(TMath::ATan2(Ncoll_y[k],Ncoll_x[k])); 
-    Ncoll_r[k]=Ra;
-    Ncoll_phi[k]=Theta;
-  }
-  
-  if(aN_part != 0 && aN_coll !=0){
-    for(int k=0;k<aN_part;k++){ 
-      Nch_r[k]=Npart_r[k];
-      Nch_phi[k]=Npart_phi[k];
-      Nch_value[k]=((0.5)*(npp)*(1-X_hard));
-    } 
-    
-    for(int k=0;k<aN_coll;k++){ 
-      Nch_r[k+aN_part]=Ncoll_r[k];
-      Nch_phi[k+aN_part]=Ncoll_phi[k];
-      Nch_value[k+aN_part]=((X_hard)*npp);
-    }
-    
-    
-    for(int N=1; N<2; N++){   
-      double RXA=0.0;
-      double RXB=0.0;
-      double RXC=0.0;
-      for(int k=0; k<Total_Nch;k++){ 
-	RXA=RXA+(Nch_value[k]* TMath::Power(Nch_r[k],(3.0)) );  
-	RXB=RXB+(Nch_value[k]* TMath::Power(Nch_r[k],(3.0))*TMath::Cos((N)*Nch_phi[k] )  );    
-	RXC=RXC+(Nch_value[k]* TMath::Power(Nch_r[k],(3.0))*TMath::Sin((N)*Nch_phi[k] )  );
-      } 
-      double R1=-(RXC/RXA);
-      double R2=-(RXB/RXA);
-      eps[N]= TMath::Sqrt((R1*R1)+(R2*R2));
-      psi[N]=((TMath::ATan2(R1,R2)))/ (N);
-    } //N-loop end
-    	   
-    for(int N = 2; N < Norder; N++){  
-      double RXA=0.0;
-      double RXB=0.0;
-      double RXC=0.0;
-      for(int k=0; k<Total_Nch;k++) { 
-	RXA=RXA+(Nch_value[k]* TMath::Power(Nch_r[k],(N)));  
-	RXB=RXB+(Nch_value[k]* TMath::Power(Nch_r[k],(N))*TMath::Cos((N)*Nch_phi[k] )  );    
-	RXC=RXC+(Nch_value[k]* TMath::Power(Nch_r[k],(N))*TMath::Sin((N)*Nch_phi[k] )  );
-      } 
-      double R1=-(RXC/RXA);
-      double R2=-(RXB/RXA);
-      eps[N]= TMath::Sqrt((R1*R1)+(R2*R2));
-      psi[N]=((TMath::ATan2(R1,R2)))/ (N);
-    } 
-    
-  }
-  else{
-    for(int ii=0; ii<Norder; ii++){
-      eps[ii]=0.0;
-      psi[ii]=0.0;
-    }
-  }  //ENDIF 1
   
 }
 

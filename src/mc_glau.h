@@ -1,5 +1,5 @@
 // *************************** //
-// *  25 feb. 2021           * //
+// *  26 Nov. 2025           * //
 // *  tribhu.451@gmail.com   * //
 // *  version 2.0            * //
 // *************************** //
@@ -15,10 +15,8 @@
 #include<sstream>
 #include<iostream>
 #include<fstream>
-#include <TRandom3.h>
-#include <TF1.h>
-#include "TMath.h"
 #include "input_data.h"
+#include "random.h"
 	
 using std::cout;
 using std::endl;
@@ -39,8 +37,6 @@ class mc_glau
     return  InData->npp * 0.5 * get_npart()* ( 1.0 - InData->xhard ) +  InData->npp * InData->xhard * get_ncoll() ; 
   }
   inline double get_impactf(){return IMPACT_PARAM;}
-  void calculate_eccentricity(int Norder, int aN_part,int aN_coll,double *Npart_x,
-                     double *Npart_y,double *Ncoll_x,double *Ncoll_y, double* eps, double* psi);
 
   void get_nucleus_A(double *X1, double *Y1, double* Z1);
   void get_nucleus_B(double *X2, double *Y2, double* Z2);
@@ -61,18 +57,6 @@ class mc_glau
 
   inline double get_inelastic_cross_section(){return sigma; }
 
-  inline double eccen1(){return eccentricity[1];}
-  inline double phi1(){return PhiN[1];}
-  inline double eccen2(){return eccentricity[2];}
-  inline double phi2(){return PhiN[2];}
-  inline double eccen3(){return eccentricity[3];}
-  inline double phi3(){return PhiN[3];}
-  inline double eccen4(){return eccentricity[4];}
-  inline double phi4(){return PhiN[4];}
-  inline double eccen5(){return eccentricity[5];}
-  inline double phi5(){return PhiN[5];}
-  inline double eccen6(){return eccentricity[6];}
-  inline double phi6(){return PhiN[6];}
 
   inline void get_npart_source_positions(double *xx, double* yy){
     for(int ii=0; ii<500; ii++){
@@ -142,14 +126,10 @@ class mc_glau
  //impact parameter range
   double bmin,bmax;
 
-// eccentricity and partcipant plane angle
-  double eccentricity[10];
-  double PhiN[10];
-
-  TRandom3* t1;
-  TRandom3* tr1;
-  TF1* f1;
-  TF1* f2;
+  random_gen* t1;
+  random_gen* tr1;
+  random_gen* f1;
+  random_gen* f2;
 
   // XA, YA, ZA -> (x,y,z) coordinate of nucleus A.
   // XB, YB, ZB -> (x,y,z) coordinate of nucleus B.

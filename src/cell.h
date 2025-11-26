@@ -5,9 +5,6 @@
 #include<sstream>
 #include<iostream>
 #include<fstream>
-#include <TRandom3.h>
-#include <TF1.h>
-#include "TMath.h"
 	
 using std::cout;
 using std::endl;
@@ -22,18 +19,6 @@ class cell{
   ix = iix;
   iy = iiy;
  }
-
-  // below functions are for each event calculationin IDNNI.
-  inline void set_contri_from_nucleus_a(int xx){ contri_from_nucleus_a = xx ;}
-  inline void set_contri_from_nucleus_b(int xx){ contri_from_nucleus_b = xx ;}
-
-  inline double get_contri_from_nucleus_a(){return contri_from_nucleus_a;}
-  inline double get_contri_from_nucleus_b(){return contri_from_nucleus_b;}
-  inline double get_net_deposition_on_the_cell(){return (contri_from_nucleus_a+contri_from_nucleus_b);}
-
-  inline void update_contri_from_nucleus_a(double xx){ contri_from_nucleus_a += xx;}
-  inline void update_contri_from_nucleus_b(double xx){ contri_from_nucleus_b += xx;}
-  
 
   // below functions are for gaussian smearing in 'each' event.  // NOTE : "each event."
   // event by event, one has to set the contribution inorder to start from fresh.  
@@ -86,12 +71,6 @@ class cell{
  private :
 
    int ix, iy;            // cell coordinate on the grid
-
-   // contribution from nucleus A and Nucleus B.
-   // Below to variables are to be used in IDNNI only.
-   double  contri_from_nucleus_a;
-   double  contri_from_nucleus_b;
-
 
    // below variables for gaussian smearing in each event.
    double  contri_from_nucleus_a_after_gaussian_smearing;

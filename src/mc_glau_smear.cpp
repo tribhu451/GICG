@@ -65,7 +65,7 @@ void mc_glau_smear::smear_it(double sigma_perp){
      epspp[iorder] = 0. ; 
      phipp[iorder] = 0. ; 
    }
-   mc->calculate_eccentricity(Norder,npart,ncoll,npart_x,npart_y,ncoll_x,ncoll_y,epspp,phipp);
+
 
 
 
@@ -183,7 +183,7 @@ void mc_glau_smear::smear_it(double sigma_perp){
      epsppx[iorder] = 0. ; 
      phippx[iorder] = 0. ; 
    }
-   mc->calculate_eccentricity(Norder,npart,ncoll,npart_x_for_rot_checker,npart_y_for_rot_checker,ncoll_x_for_rot_checker,ncoll_y_for_rot_checker,epsppx,phippx);
+
 
    if(fabs(epspp[2]-epsppx[2]) > 0.03 ){
      std::cout << "Error in Rotation(eccentricity)." << std::endl ; 

@@ -4,9 +4,6 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
-#include <TRandom3.h>
-#include <TF1.h>
-#include "TMath.h"
 #include "input_data.h"
 #include "mc_glau.h"
 #include "cell.h"

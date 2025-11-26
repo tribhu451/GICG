@@ -1,7 +1,4 @@
 
-ROOTCFLAGS   := $(shell root-config --cflags)
-ROOTLIBS     := $(shell root-config --libs)
-
 GSLLIBS      := $(shell gsl-config --libs)
 
 #EXTRA_FLAGS = -D SIMPLE # EoS p=e/3
@@ -12,13 +9,13 @@ CXXFLAGS      = -Wall -fPIC -O3 -march=native
 LD            = g++
 LDFLAGS       = -O3 -march=native
 
-CXXFLAGS     += $(ROOTCFLAGS) $(EXTRA_FLAGS)
-LIBS          = $(ROOTLIBS) $(SYSLIBS) $(GSLLIBS)
+CXXFLAGS     +=  $(EXTRA_FLAGS)
+LIBS          =  $(SYSLIBS) $(GSLLIBS)
 
 vpath %.cpp src
 objdir     = obj
 
-SRC        = main.cpp job.cpp grid.cpp  mc_glau.cpp idnni.cpp cell.cpp rap_extn.cpp mc_glau_smear.cpp
+SRC        = main.cpp job.cpp grid.cpp  mc_glau.cpp cell.cpp random.cpp mc_glau_smear.cpp
              
 OBJS       = $(patsubst %.cpp,$(objdir)/%.o,$(SRC)) 
               
