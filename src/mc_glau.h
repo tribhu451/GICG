@@ -174,10 +174,12 @@ void set_mc_glau_params()
   if(InData->projectile == "Au") {A= 197; p_radius = 6.42; p_dlt=0.41; p_beta2 = -0.13; p_beta4 =0.0;} //arXiv: 1409.8375 [Table. 1]
   else if(InData->projectile == "Au2") {A= 197; p_radius = 6.37; p_dlt=0.53; p_beta2 = 0.0; p_beta4 =0.0;} //arXiv: 1409.8375 [Table. 1]
   else if(InData->projectile == "Pb") {A= 208; p_radius = 6.66; p_dlt=0.45; p_beta2 = 0.0; p_beta4 =0.0;}
+  else if(InData->projectile == "Pb_trento") {A= 208; p_radius = 6.62; p_dlt=0.546; p_beta2 = 0.0; p_beta4 =0.0;}
   else if(InData->projectile == "Cu") {A= 63; p_radius = 4.2; p_dlt=0.596; p_beta2 = 0.0; p_beta4 =0.0;} // https://arxiv.org/pdf/2011.14909.pdf
   else if(InData->projectile == "p") {A= 1; p_radius = 0.1; p_dlt=0.1; p_beta2 = 0.0; p_beta4 =0.0;} // woods-saxon params can be ignored-
   //because we will sample only one nucleon.
   else if(InData->projectile == "U") {A= 238; p_radius = 6.86; p_dlt=0.42; p_beta2 = 0.265; p_beta4 =0.093;}
+  else if(InData->projectile == "U_trento") {A= 238; p_radius = 6.81; p_dlt=0.600; p_beta2 = 0.280; p_beta4 =0.093;}
   else if(InData->projectile == "U2") {A= 238; p_radius = 6.86; p_dlt=0.42; p_beta2 = 0.0; p_beta4 =0.0;}
   else {cout<<"projectile not recognized, it's : "<<InData->projectile<<endl; exit(1);}
   
@@ -185,13 +187,14 @@ void set_mc_glau_params()
   if(InData->target == "Au") {B= 197; t_radius = 6.42; t_dlt=0.41; t_beta2 = -0.13; t_beta4 =0.0;}
   else if(InData->target == "Au2") {B= 197; t_radius = 6.37; t_dlt=0.53; t_beta2 = 0.00; t_beta4 =0.0;} 
   else if(InData->target == "Pb") {B= 208; t_radius = 6.66; t_dlt=0.45; t_beta2 = 0.0; t_beta4 =0.0;}
+  else if(InData->target == "Pb_trento") {B= 208; t_radius = 6.62; t_dlt=0.546; t_beta2 = 0.0; t_beta4 =0.0;}
   else if(InData->target == "Cu") {B= 63; t_radius = 4.2; t_dlt=0.596; t_beta2 = 0.0; t_beta4 =0.0;}
   else if(InData->target == "p") {B= 1; t_radius = 0.1; t_dlt=0.1; t_beta2 = 0.0; t_beta4 =0.0;}
   else if(InData->target == "U"){B =238;  t_radius = 6.86; t_dlt=0.42; t_beta2 = 0.265; t_beta4 =0.093;}
+  else if(InData->target == "U_trento"){B =238;  t_radius = 6.81; t_dlt=0.600; t_beta2 = 0.280; t_beta4 =0.093;}
   else if(InData->target == "U2"){B =238;  t_radius = 6.86; t_dlt=0.42; t_beta2 = 0.0; t_beta4 =0.0;}
   else {cout<<"target not recognized, it's : "<<InData->target<<endl; exit(1);}
   
-
   // collision energy and inelastic cross-section
   if (InData->SNN > 5.0 ){
     //  https://arxiv.org/pdf/1901.04484.pdf ( Equation-4 )  //
