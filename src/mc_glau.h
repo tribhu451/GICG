@@ -28,7 +28,7 @@ class mc_glau
 
   mc_glau(InputData *InData1);
   ~mc_glau();
-  void event(int flag_for_centrality_calculation );
+  void event();
   inline int get_npart(){return NPART;}
   inline int get_no_of_participants_in_nucleus_a(){return Nparticipants_from_A;}
   inline int get_no_of_participants_in_nucleus_b(){return Nparticipants_from_B;}
@@ -209,6 +209,7 @@ void set_mc_glau_params()
   if (InData->SNN == 62.4  )  {  sigma =3.56;   }
   if (InData->SNN == 19.6  )  {  sigma =3.23;   }
   if (InData->SNN == 2760.0)  {  sigma =6.40;   }
+  if (InData->SNN == 5020.0)  {  sigma =7.00;   }
   if (InData->SNN == 5500.0)  {  sigma =7.20;   }
   if (InData->SNN < 5.0 ){ 
      cout<<"Glauber inelastic crossection not available ..."<<endl; 

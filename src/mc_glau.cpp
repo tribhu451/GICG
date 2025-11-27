@@ -27,7 +27,7 @@ mc_glau::~mc_glau()
 
 
 // This is the master function
-void mc_glau::event(int flag_for_eccentricity_calculation)
+void mc_glau::event()
 {
   NPART = 1E5;
   NCOLL = 1E5;
@@ -76,8 +76,7 @@ void mc_glau::event(int flag_for_eccentricity_calculation)
   
   // calculating npart & ncoll ...
   calculate_npart_ncoll(XA,YA,XB,YB,NPART,NCOLL,npart_x,npart_y,ncoll_x, ncoll_y);                    
-  //cout<<"[Info] No. of participants : "<<NPART<<endl;
-  //cout<<"[Info] No. of binary collisions : "<<NCOLL<<endl; 
+
 }
 
 

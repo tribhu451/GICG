@@ -11,24 +11,19 @@ mode 1
 
 #collision energy
 #[Info] in GeV
-SNN 200.0
+SNN 5020.0
 
 
 #collision species & impact parameter
 #[Info] species can be (Au,U,Pb,p) 
-projectile Au2
-target Au2
+projectile Pb_trento
+target Pb_trento
 bmin  0.0001
-bmax  15.0002
+bmax  18.0002
 
 # Two component MC Glauber parametrs
 npp 1.0
 xhard 0.14
-
-#minimum bias run root output file name, required for centrality determination.
-root_output_file_name    output/Au_Au_200_min_bias_idnni_nx_201.root
-
-
 
 
 #Grid, smearing and event averaged profile parameters
