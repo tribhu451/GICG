@@ -49,6 +49,7 @@ void read_input_data_(InputData *input_parameter_list, string input_file_name)
       if(a_ == "bmin" )  {input_parameter_list->bmin = atof(a);}       
       if(a_ == "bmax" )  {input_parameter_list->bmax = atof(a);}  
       
+      if(a_ == "gamma_fluctuation_k" )  {input_parameter_list->gamma_fluctuation_k = atof(a);}       
       if(a_ == "xhard" )  {input_parameter_list->xhard = atof(a);}       
       if(a_ == "npp" )  {input_parameter_list->npp = atof(a);} 
 

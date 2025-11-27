@@ -24,7 +24,7 @@ bmax  18.0002
 # Two component MC Glauber parametrs
 npp 1.0
 xhard 0.14
-
+gamma_fluctuation_k 1.4
 
 #Grid, smearing and event averaged profile parameters
 xmax 12

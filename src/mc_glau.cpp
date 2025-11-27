@@ -9,12 +9,13 @@ mc_glau::mc_glau(InputData *InData1)
 {
   InData = InData1; 
   set_mc_glau_params();
+  double gamma_k = InData->gamma_fluctuation_k ; 
     
   t1 = new random_gen();
   tr1 = new random_gen();
   f1 = new random_gen();
   f2 = new random_gen();
-  
+  w1 = new random_gen(gamma_k);
 }
 
 mc_glau::~mc_glau()
@@ -23,6 +24,7 @@ mc_glau::~mc_glau()
   delete tr1;
   delete f1;
   delete f2;
+  delete w1;
 }
 
 
@@ -35,11 +37,11 @@ void mc_glau::event()
   
   for(int j=0;j<=A;j++){XA[j]=0.0;YA[j]=0.0;ZA[j]=0.0;npart_tag_A[j]=0;}
   for(int j=0;j<=B;j++){XB[j]=0.0;YB[j]=0.0;ZB[j]=0.0;npart_tag_B[j]=0;}
-  for(int j=0;j<500;j++){npart_x[j]=0.0;npart_y[j]=0.0;}
+  for(int j=0;j<500;j++){npart_x[j]=0.0;npart_y[j]=0.0;npart_w[j]=0.0;}
   for(int j=0;j<10000;j++){ncoll_x[j]=0.0;ncoll_y[j]=0.0;}
   
-  for(int j=0;j<500;j++){npart_x_of_A[j]=0.0;npart_y_of_A[j]=0.0;}
-  for(int j=0;j<500;j++){npart_x_of_B[j]=0.0;npart_y_of_B[j]=0.0;}
+  for(int j=0;j<500;j++){npart_x_of_A[j]=0.0;npart_y_of_A[j]=0.0;npart_w_of_A[j]=0.0;}
+  for(int j=0;j<500;j++){npart_x_of_B[j]=0.0;npart_y_of_B[j]=0.0;npart_w_of_B[j]=0.0;}
 
   shift_xavg_of_nucleons = 0. ;   
   shift_yavg_of_nucleons = 0. ;   
@@ -162,6 +164,7 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
   Nparticipants_from_B = 0 ; 
 
 
+  double weight;
   double occA[1000];
   double occB[1000];         //flag during calc of Npart
   //double Ncoll_x[2000]; double Ncoll_y[2000];  // x & y co-ordinate of binary collision sources
@@ -190,9 +193,14 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
             npart_tag_A[i] = 1 ; 
 	    Npart_x[Npart]=vxA[i];
 	    Npart_y[Npart]=vyA[i];
+	    
+	    weight = w1->rand_gamma();
+	    npart_w[Npart]= weight;
+	    
 	    Npart=Npart+1;
 	    npart_x_of_A[Nparticipants_from_A]=vxA[i];
 	    npart_y_of_A[Nparticipants_from_A]=vyA[i]; 
+	    npart_w_of_A[Nparticipants_from_A]=weight; 
             Nparticipants_from_A += 1 ;
 	  } 
 	  if(occB[j]==0){
@@ -200,15 +208,23 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
             npart_tag_B[j] = 1 ; 
 	    Npart_x[Npart]=vxB[j];
 	    Npart_y[Npart]=vyB[j];
+	    
+	    weight = w1->rand_gamma();
+	    npart_w[Npart]=weight;
+	    
 	    Npart=Npart+1;
 	    npart_x_of_B[Nparticipants_from_B]=vxB[j];
 	    npart_y_of_B[Nparticipants_from_B]=vyB[j]; 
+	    npart_w_of_B[Nparticipants_from_B]=weight; 
             Nparticipants_from_B += 1 ; 
 	  }
 	  
 	}                                                           
       }                                                          
-  }                                                         
+  }        
+  
+  
+  /*                                                 
   // [Info]  shifting the energy distributions center to (0,0,0)   
   double xref1=0.0;
   double yref1=0.0;
@@ -249,9 +265,10 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
     npart_x_of_B[k] = npart_x_of_B[k]-xAverage;
     npart_y_of_B[k] = npart_y_of_B[k]-yAverage;
   }
-
+  
   shift_xavg_of_nucleons = xAverage ;   
   shift_yavg_of_nucleons = yAverage ;   
+  */
   
 }
 

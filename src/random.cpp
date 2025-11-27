@@ -13,6 +13,11 @@ random_gen::random_gen(double k ) : rand_uniform_dist(0.,1.), rand_gamma_dist(k,
   seed = ran_dev();
   //seed = 12345 ;  // avoid the randomness by turning on this one (only for check purpose) ... :)
   ran_generator = std::unique_ptr<std::mt19937>(new std::mt19937(seed));
+  
+  // some facts about gamma function
+  // Gamma(k, θ) has mean: μ=kθ and variance σ^2=k*θ^2
+  // If you require unit–mean weights (common in Trento-like models), you set : θ=1/k
+  // So rand_gamma(k, 1/k) will return weights fluctuating around 1.
 }
 
 

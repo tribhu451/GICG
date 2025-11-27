@@ -28,6 +28,7 @@ typedef struct input_data
   int ny ;
 
   double gaussian_smearing_sigma ;
+  double gamma_fluctuation_k ;
 
   double lower_mult_proxy_cut ;  
   double upper_mult_proxy_cut ; 

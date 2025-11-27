@@ -43,17 +43,17 @@ int main(int argc, char **argv)
   cout<<"Total no of events : "<<event_no<<endl;  
   cout << InData.projectile << "+" << InData.target << " at " << InData.SNN << "GeV" << endl;
 
+  
   grid* arena = new grid(&InData);
   mc_glau* MC = new mc_glau(&InData);
   job* JOB = new job(&InData,arena,MC); 
 
-
   JOB->gaussian_smearing_for_ebe_mc_glauber_events(event_no); 
-
+ 
   delete MC ;
   delete arena ;
   delete JOB ;
-
+  
   return 0;
 }
 

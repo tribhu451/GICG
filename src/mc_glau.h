@@ -65,6 +65,12 @@ class mc_glau
     }
   }
 
+  inline void get_npart_weight(double *ww){
+    for(int ii=0; ii<500; ii++){
+      ww[ii] = npart_w[ii] ; 
+    }
+  }
+
   inline void get_ncoll_source_positions(double *xx, double* yy){
     for(int ii=0; ii<10000; ii++){
       xx[ii] = ncoll_x[ii] ; 
@@ -80,6 +86,12 @@ class mc_glau
     }
   }
 
+  inline void get_npart_weight_of_nucleus_a(double *ww){
+    for(int ii=0; ii<500; ii++){
+      ww[ii] = npart_w_of_A[ii] ; 
+    }
+  }
+
 
   inline void get_npart_source_positions_of_nucleus_b(double *xx, double* yy){
     for(int ii=0; ii<500; ii++){
@@ -88,6 +100,11 @@ class mc_glau
     }
   }
 
+  inline void get_npart_weight_of_nucleus_b(double *ww){
+    for(int ii=0; ii<500; ii++){
+      ww[ii] = npart_w_of_B[ii] ; 
+    }
+  }
 
 
  
@@ -130,6 +147,7 @@ class mc_glau
   random_gen* tr1;
   random_gen* f1;
   random_gen* f2;
+  random_gen* w1;
 
   // XA, YA, ZA -> (x,y,z) coordinate of nucleus A.
   // XB, YB, ZB -> (x,y,z) coordinate of nucleus B.
@@ -137,7 +155,7 @@ class mc_glau
   double XB[300];double YB[300];double ZB[300];
   int npart_tag_A[300];
   int npart_tag_B[300];
-  double npart_x[500],npart_y[500];
+  double npart_x[500],npart_y[500], npart_w[500];
   double ncoll_x[10000],ncoll_y[10000];
 
 
@@ -148,8 +166,8 @@ class mc_glau
 
   
   // individual contribution
-  double npart_x_of_A[500],npart_y_of_A[500];
-  double npart_x_of_B[500],npart_y_of_B[500];
+  double npart_x_of_A[500],npart_y_of_A[500],npart_w_of_A[500];
+  double npart_x_of_B[500],npart_y_of_B[500],npart_w_of_B[500];
 
 
   void generate_nucleus(double* X1, double* Y1,double* Z1,int A,
