@@ -47,8 +47,8 @@ int main(int argc, char **argv)
   mc_glau* MC = new mc_glau(&InData);
   job* JOB = new job(&InData,arena,MC); 
 
-  JOB->rotate_by_second_order_participant_plane_and_then_gaussian_smearing_for_event_averaged_profile_using_mc_glauber(event_no); 
 
+  JOB->gaussian_smearing_for_ebe_mc_glauber_events(event_no); 
 
   delete MC ;
   delete arena ;
