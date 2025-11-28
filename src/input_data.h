@@ -16,9 +16,6 @@ typedef struct input_data
 
   double bmin,bmax;
 
-  double xhard;
-  double npp;
-
   string root_output_file_name ;
 
   double xmax ;

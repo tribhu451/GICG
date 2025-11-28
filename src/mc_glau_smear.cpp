@@ -185,20 +185,10 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
     for(int iy = 0 ; iy < arena->get_ny() ; iy++ ){
       double grid_x = -arena->get_xmax() + ix * arena->get_dx() ; 
       double grid_y = -arena->get_ymax() + iy * arena->get_dy() ;
-     // if( arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_over_all_events() > 0.000001 && 
-     //	  arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_over_all_events() > 0.000001 ){
-	mult = ( 0.5 * inparams->npp * ( 1 - inparams->xhard ) ) * ( arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_over_all_events() +
-	         arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_over_all_events() ) 
-                 + ( inparams->npp * ( inparams->xhard ) ) * ( arena->get_cell(ix,iy)->get_contribution_from_binary_collisions_over_all_events() ) ; 
-        mult_a    = ( 0.5 * inparams->npp * (1-inparams->xhard) )   * arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_over_all_events() ; 
-        mult_b    = ( 0.5 * inparams->npp * (1-inparams->xhard) )   * arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_over_all_events() ; 
-        mult_coll = ( inparams->npp * ( inparams->xhard ) ) * arena->get_cell(ix,iy)->get_contribution_from_binary_collisions_over_all_events() ; 
         npart_contri_of_a = arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_over_all_events() ; 
         npart_contri_of_b = arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_over_all_events() ; 
         ncoll_contri      = arena->get_cell(ix,iy)->get_contribution_from_binary_collisions_over_all_events() ; 
-
-      //}
-      if( mult < 0.0000001 ){
+      if((npart_contri_of_a+npart_contri_of_b) < 0.0000001 ){
 	mult              = 0.00000003 ; 
 	mult_a            = 0.00000001 ; 
 	mult_b            = 0.00000001 ; 

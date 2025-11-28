@@ -33,9 +33,6 @@ class mc_glau
   inline int get_no_of_participants_in_nucleus_a(){return Nparticipants_from_A;}
   inline int get_no_of_participants_in_nucleus_b(){return Nparticipants_from_B;}
   inline int get_ncoll(){return NCOLL;}
-  inline double get_two_component_galuber_multiplicity_proxy(){
-    return  InData->npp * 0.5 * get_npart()* ( 1.0 - InData->xhard ) +  InData->npp * InData->xhard * get_ncoll() ; 
-  }
   inline double get_impactf(){return IMPACT_PARAM;}
 
   void get_nucleus_A(double *X1, double *Y1, double* Z1);
@@ -136,10 +133,6 @@ class mc_glau
   int Nparticipants_from_A ; 
   int Nparticipants_from_B ; 
 
-// two-component energy deposition
-  double npp;
-  double X_hard;
-
  //impact parameter range
   double bmin,bmax;
 
@@ -185,8 +178,6 @@ class mc_glau
 
 void set_mc_glau_params()
 {
-  npp = InData->npp;
-  X_hard = InData->xhard;
 
   // projectile nucleus
   if(InData->projectile == "Au") {A= 197; p_radius = 6.42; p_dlt=0.41; p_beta2 = -0.13; p_beta4 =0.0;} //arXiv: 1409.8375 [Table. 1]
