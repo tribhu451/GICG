@@ -24,9 +24,9 @@
  CHECKS TODO :
    1. check b distribution (minimum bias).  (Taking same Pb and U nucleus parameter as in trento)
    2. check Npart distribution (minimum bias). (Taking same Pb and U nucleus parameter as in trento)
-   3. introduce gamma fluctuation and check whether gamma function is correct or not.    (checked )
+   3. introduce gamma fluctuation and check whether gamma function is correct or not.                          (checked )
    4. after introducing gamma fluctuation check the multiplicity distribution and compare with trento.
    5. Then compare e2, e3 distribution in different centrality and compare with trento.
    
-   6. remove two component Glauber case.
+   6. remove two component Glauber case.    (done)
    7. Recenter the energy distribution or not ? think about it !!!

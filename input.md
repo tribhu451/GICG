@@ -19,11 +19,9 @@ SNN 5020.0
 projectile Pb_trento
 target Pb_trento
 bmin  0.0001
-bmax  18.0002
+bmax  18.0001
 
-# Two component MC Glauber parametrs
-npp 1.0
-xhard 0.14
+
 gamma_fluctuation_k 1.4
 
 #Grid, smearing and event averaged profile parameters
@@ -32,10 +30,10 @@ ymax 12
 nx   241
 ny   241
 gaussian_smearing_sigma 0.4
+
+
 upper_mult_proxy_cut  10000000.00
-lower_mult_proxy_cut  0.000
-
-
+lower_mult_proxy_cut  00000000.00
 
 
 # :: END :: #

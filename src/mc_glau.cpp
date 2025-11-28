@@ -90,14 +90,12 @@ void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int A,
   double CMx=0.0;double CMy=0.0;double CMz=0.0;
   int count=0;
   
-  do
-    {
+  do{
       double r=(15.0)*(tr1->rand_uniform());
       double Theta=(M_PI)*(tr1->rand_uniform());
       double Phi=((2.0)*M_PI)*(tr1->rand_uniform());
       double test=tr1->rand_uniform();
-      
-      
+        
       double Y20=0.25*sqrt(5.0/M_PI)*
 	(3*cos(Theta)*cos(Theta)-1.0);
       double Y40=(3.0/(16.0*sqrt(M_PI)))* 
@@ -112,17 +110,14 @@ void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int A,
 	 exit(1);
       }      
       
-      if(test < rho )
-	{      
-	  
+      if(test < rho){
 	  X[count]= (r*sin(Theta)*cos(Phi));
 	  Y[count]=(r*sin(Theta)*sin(Phi));
 	  Z[count]=(r*cos(Theta));
 	  CMx=CMx+X[count]; CMy=CMy+Y[count] ;CMz=CMz+Z[count];    
 	  count=count+1;
-	}   
-    }   
-  while(count<A);
+      }   
+    }while(count<A);
   
   CMx=CMx/A;CMy=CMy/A;CMz=CMz/A;
   
@@ -131,8 +126,7 @@ void mc_glau::generate_nucleus(double* X1, double* Y1,double* Z1,int A,
   //etaA - nucleus orientaton angle (theta)
   //psiA - nucleus orientation angle (phi)
   
-  for(int j=0;j<A;j++)
-    {
+  for(int j=0;j<A;j++){
       X1[j]=(cos(psiA)*cos(etaA)*X[j])+(-sin(psiA)*Y[j])+(-cos(psiA)*sin(etaA)*Z[j]);
       Y1[j]=(sin(psiA)*cos(etaA)*X[j])+(cos(psiA)*Y[j])+(-sin(psiA)*sin(etaA)*Z[j]);
       Z1[j]=(sin(etaA)*X[j])+(cos(etaA)*Z[j]);
