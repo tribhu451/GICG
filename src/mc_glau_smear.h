@@ -16,11 +16,13 @@ class mc_glau_smear {
     void write_event_averaged_profile_to_file_after_gaussian_smearing(int nEvents, int flag_to_generate_music_boost_invariant_file, int event_index);
     void reset_contribution_to_zero_on_the_cells();
     double get_reduced_thickness_after_gaussian_smearing();
+    void get_eccentricities_after_gaussian_smearing(double* eccentricity_);
     
   private :
     mc_glau* mc;
     grid* arena ; 
     InputData *inparams;
+    double TINY;
 
     int    npart, ncoll                   ; 
     double npart_x[500],npart_y[500]      ;
@@ -35,5 +37,6 @@ class mc_glau_smear {
       ix =  ceil( ( xx - (-arena->get_xmax() ) ) / arena->get_dx() ) ; 
       iy =  ceil( ( yy - (-arena->get_ymax() ) ) / arena->get_dy() ) ; 
     }
+
 
 };

@@ -4,6 +4,7 @@ mc_glau_smear::mc_glau_smear(InputData *inparams_,grid* arena_, mc_glau* _mc){
   inparams = inparams_ ; 
   mc = _mc ;
   arena = arena_ ; 
+  TINY = 1e-10 ; 
 }
 
 mc_glau_smear::~mc_glau_smear(){
@@ -231,7 +232,7 @@ double mc_glau_smear::get_reduced_thickness_after_gaussian_smearing() {
   for (int iy = 0; iy < arena->get_ny(); ++iy) {
     for (int ix = 0; ix < arena->get_nx(); ++ix) {
       TA = arena->get_cell(ix,iy)->get_contri_from_nucleus_a_after_gaussian_smearing() ; 
-      TB = arena->get_cell(ix,iy)->get_contri_from_nucleus_a_after_gaussian_smearing() ; 
+      TB = arena->get_cell(ix,iy)->get_contri_from_nucleus_b_after_gaussian_smearing() ; 
       sum += reduced_thickness_func(TA,TB);
     }
   }
@@ -239,32 +240,62 @@ double mc_glau_smear::get_reduced_thickness_after_gaussian_smearing() {
 }
 
 
-/*
-void Event::compute_observables() {
+
+// this function is taken from trento and modified
+void mc_glau_smear::get_eccentricities_after_gaussian_smearing(double* eccentricity_) {
   // Compute eccentricity.
 
-  // Simple helper class for use in the following loop.
+ // Simple helper class for use in the following loop.
   struct EccentricityAccumulator {
     double re = 0.;  // real part
     double im = 0.;  // imaginary part
     double wt = 0.;  // weight
     double finish() const  // compute final eccentricity
-    { return std::sqrt(re*re + im*im) / std::fmax(wt, TINY); }
+    { return std::sqrt(re*re + im*im) / std::fmax(wt, 1e-10); }
   } e2, e3, e4, e5;
 
-  for (int iy = 0; iy < nsteps_; ++iy) {
-    for (int ix = 0; ix < nsteps_; ++ix) {
-      const auto& t = TR_[iy][ix];
+  // first calculate xcm and ycm of the dist
+  double sumx = 0.;
+  double sumy = 0.;
+  double sumw = 0.;
+  double TA ;
+  double TB ; 
+  double TR ;
+  double t ; 
+  double cmx;
+  double cmy;
+  for (int iy = 0; iy < arena->get_ny(); ++iy) {
+    for (int ix = 0; ix < arena->get_nx(); ++ix) {
+      auto x = -arena->get_xmax() + ix * arena->get_dx() ;
+      auto y = -arena->get_ymax() + iy * arena->get_dy() ;
+      TA = arena->get_cell(ix,iy)->get_contri_from_nucleus_a_after_gaussian_smearing() ; 
+      TB = arena->get_cell(ix,iy)->get_contri_from_nucleus_b_after_gaussian_smearing() ; 
+      TR = reduced_thickness_func(TA,TB);
+      sumx += x * TR ; 
+      sumy += y * TR ; 
+      sumw += TR ; 
+    }
+  }
+  cmx = sumx / sumw ; 
+  cmy = sumy / sumw ; 
+ 
+ 
+  for (int iy = 0; iy < arena->get_ny(); ++iy) {
+    for (int ix = 0; ix < arena->get_nx(); ++ix) {
+      TA = arena->get_cell(ix,iy)->get_contri_from_nucleus_a_after_gaussian_smearing() ; 
+      TB = arena->get_cell(ix,iy)->get_contri_from_nucleus_b_after_gaussian_smearing() ; 
+      t = reduced_thickness_func(TA,TB);
+
       if (t < TINY)
         continue;
 
       // Compute (x, y) relative to the CM and cache powers of x, y, r.
-      auto x = static_cast<double>(ix) - ixcm_;
+      auto x = -arena->get_xmax() + ix * arena->get_dx() - cmx;
       auto x2 = x*x;
       auto x3 = x2*x;
       auto x4 = x2*x2;
 
-      auto y = static_cast<double>(iy) - iycm_;
+      auto y = -arena->get_ymax() + iy * arena->get_dy() - cmy;
       auto y2 = y*y;
       auto y3 = y2*y;
       auto y4 = y2*y2;
@@ -326,9 +357,9 @@ void Event::compute_observables() {
   eccentricity_[5] = e5.finish();
 }
 
-}  // namespace trento
 
-*/
+
+
 
 
 
