@@ -29,4 +29,4 @@
    5. Then compare e2, e3 distribution in different centrality and compare with trento.
    
    6. remove two component Glauber case.    (done)
-   7. Recenter the energy distribution or not ? think about it !!!
+   7. Recenter the energy distribution or not ? think about it !!! (we will do it while calculating before eccentricity. else not required.)

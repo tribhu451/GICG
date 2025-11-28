@@ -19,11 +19,13 @@ void mc_glau_smear::smear_it(double sigma_perp){
   for(int ii = 0; ii < 500; ii++){
     npart_x_of_nucleus_a[ii] = -9999. ; 
     npart_y_of_nucleus_a[ii] =  9999. ; 
+    npart_w_of_nucleus_a[ii] =  0. ; 
   }
 
   for(int ii = 0; ii < 500; ii++){
     npart_x_of_nucleus_b[ii] = -9999. ; 
     npart_y_of_nucleus_b[ii] =  9999. ; 
+    npart_w_of_nucleus_b[ii] =  0. ; 
   }
 
   for(int ii = 0; ii < 10000; ii++){
@@ -31,10 +33,18 @@ void mc_glau_smear::smear_it(double sigma_perp){
     ncoll_y[ii] =  9999. ; 
   }
 
+  double sigma_perp_sq_ = sqr(sigma_perp) ;
+  double smearing_range_ ;
+  double contributors_x ; 
+  double contributors_y ; 
+  double contributors_w ; 
+
   // collect the npart and ncoll sources info from MC Glauber class.
   mc->get_npart_source_positions(npart_x, npart_y); 
   mc->get_npart_source_positions_of_nucleus_a(npart_x_of_nucleus_a, npart_y_of_nucleus_a); 
   mc->get_npart_source_positions_of_nucleus_b(npart_x_of_nucleus_b, npart_y_of_nucleus_b); 
+  mc->get_npart_weight_of_nucleus_a(npart_w_of_nucleus_a); 
+  mc->get_npart_weight_of_nucleus_b(npart_w_of_nucleus_b);   
   mc->get_ncoll_source_positions(ncoll_x, ncoll_y);
   // the sources are already adjusted to give CM = (0,0)
    
@@ -51,23 +61,21 @@ void mc_glau_smear::smear_it(double sigma_perp){
 
   // smear the participant sources of Nucleus A.
   for(int ipart=0; ipart < mc->get_no_of_participants_in_nucleus_a() ; ipart++ ){
-    double contributors_x ; 
-    double contributors_y ; 
     contributors_x = npart_x_of_nucleus_a[ipart] ; 
     contributors_y = npart_y_of_nucleus_a[ipart] ;
+    contributors_w = npart_w_of_nucleus_a[ipart] ;
+    smearing_range_ = 4. * sigma_perp ; 
     int upper_index_x, upper_index_y ; 
-    get_nearest_cell_index( contributors_x + 4 * sigma_perp , contributors_y + 4 * sigma_perp , upper_index_x, upper_index_y ) ; 
+    get_nearest_cell_index( contributors_x + smearing_range_ , contributors_y + smearing_range_ , upper_index_x, upper_index_y ) ; 
     int lower_index_x, lower_index_y ;  
-    get_nearest_cell_index( contributors_x - 4 * sigma_perp , contributors_y - 4 * sigma_perp , lower_index_x, lower_index_y ) ;
+    get_nearest_cell_index( contributors_x - smearing_range_ , contributors_y - smearing_range_ , lower_index_x, lower_index_y ) ;
     for(int ix = lower_index_x ; ix < upper_index_x ; ix++ ){
       for(int iy = lower_index_y ; iy < upper_index_y ; iy++ ){
         double grid_x = -arena->get_xmax() + ix * arena->get_dx() ; 
         double grid_y = -arena->get_ymax() + iy * arena->get_dy() ;
-	double weight_a = 0.25 * ( -erf( (grid_x - arena->get_dx() / 2 - contributors_x) / sqrt(2) / sigma_perp ) + 
-				     erf((grid_x + arena->get_dx() / 2 - contributors_x) / sqrt(2) / sigma_perp) )
-	    * ( -erf( (grid_y - arena->get_dy() / 2 - contributors_y) / sqrt(2) / sigma_perp ) + 
-		erf((grid_y + arena->get_dy() / 2 - contributors_y) / sqrt(2) / sigma_perp) ) ;
-	  
+        double prefactor_ = 1. / ( 2. * M_PI * sigma_perp_sq_ ) ; 
+        double distance_sq = sqr(grid_x - contributors_x) + sqr(grid_y - contributors_y);
+        double weight_a = prefactor_ * contributors_w * exp(-.5*distance_sq/sigma_perp_sq_); 
         arena->get_cell(ix,iy)->update_contri_from_nucleus_a_after_gaussian_smearing(weight_a);
       } // iy loop
     } // ix loop
@@ -76,29 +84,28 @@ void mc_glau_smear::smear_it(double sigma_perp){
 
   // smear the participant sources of Nucleus B.
   for(int ipart=0; ipart < mc->get_no_of_participants_in_nucleus_b() ; ipart++ ){
-    double contributors_x ; 
-    double contributors_y ; 
     contributors_x = npart_x_of_nucleus_b[ipart] ; 
     contributors_y = npart_y_of_nucleus_b[ipart] ;
+    contributors_w = npart_w_of_nucleus_b[ipart] ;
+    smearing_range_ = 4. * sigma_perp ; 
     int upper_index_x, upper_index_y ; 
-    get_nearest_cell_index( contributors_x + 4 * sigma_perp , contributors_y + 4 * sigma_perp , upper_index_x, upper_index_y ) ; 
+    get_nearest_cell_index( contributors_x + smearing_range_ , contributors_y + smearing_range_ , upper_index_x, upper_index_y ) ; 
     int lower_index_x, lower_index_y ;  
-    get_nearest_cell_index( contributors_x - 4 * sigma_perp , contributors_y - 4 * sigma_perp , lower_index_x, lower_index_y ) ;
+    get_nearest_cell_index( contributors_x - smearing_range_ , contributors_y - smearing_range_ , lower_index_x, lower_index_y ) ;
     for(int ix = lower_index_x ; ix < upper_index_x ; ix++ ){
       for(int iy = lower_index_y ; iy < upper_index_y ; iy++ ){
         double grid_x = -arena->get_xmax() + ix * arena->get_dx() ; 
         double grid_y = -arena->get_ymax() + iy * arena->get_dy() ;
-	double weight_b = 0.25 * ( -erf( (grid_x - arena->get_dx() / 2 - contributors_x) / sqrt(2) / sigma_perp ) + 
-				     erf((grid_x + arena->get_dx() / 2 - contributors_x) / sqrt(2) / sigma_perp) )
-	    * ( -erf( (grid_y - arena->get_dy() / 2 - contributors_y) / sqrt(2) / sigma_perp ) + 
-		erf((grid_y + arena->get_dy() / 2 - contributors_y) / sqrt(2) / sigma_perp) ) ;
-
+        double prefactor_ = 1. / ( 2. * M_PI * sigma_perp_sq_ ) ; 
+        double distance_sq = sqr(grid_x - contributors_x) + sqr(grid_y - contributors_y);
+        double weight_b = prefactor_ * contributors_w * exp(-.5*distance_sq/sigma_perp_sq_); 
         arena->get_cell(ix,iy)->update_contri_from_nucleus_b_after_gaussian_smearing(weight_b);
       } // iy loop
     } // ix loop
   } // ipart loop
 
 
+  /*
   // smear the binary collison sources.
   for(int icoll=0; icoll < mc->get_ncoll() ; icoll++ ){
     double contributors_x ; 
@@ -113,33 +120,17 @@ void mc_glau_smear::smear_it(double sigma_perp){
       for(int iy = lower_index_y ; iy < upper_index_y ; iy++ ){
         double grid_x = -arena->get_xmax() + ix * arena->get_dx() ; 
         double grid_y = -arena->get_ymax() + iy * arena->get_dy() ;
-	double weight_ncoll = 0.25 * ( -erf( (grid_x - arena->get_dx() / 2 - contributors_x) / sqrt(2) / sigma_perp ) + 
-				     erf((grid_x + arena->get_dx() / 2 - contributors_x) / sqrt(2) / sigma_perp) )
-	    * ( -erf( (grid_y - arena->get_dy() / 2 - contributors_y) / sqrt(2) / sigma_perp ) + 
-		erf((grid_y + arena->get_dy() / 2 - contributors_y) / sqrt(2) / sigma_perp) );
-	   
+	   double weight_ncoll = 0 ; 
         arena->get_cell(ix,iy)->update_contri_from_binary_collisions_after_gaussian_smearing(weight_ncoll);
       } // iy loop
     } // ix loop
   } // icoll loop
-
-}
-
-
-void mc_glau_smear::update_contribution_on_cells_over_all_events_with_gaussian_smearing(){
-  for(int ix = 0 ; ix < arena->get_nx() ; ix++ ){
-    for(int iy = 0 ; iy < arena->get_ny() ; iy++ ){
-	arena->get_cell(ix,iy)->update_contribution_from_nucleus_a_over_all_events(arena->get_cell(ix,iy)->get_contri_from_nucleus_a_after_gaussian_smearing()) ;
-	arena->get_cell(ix,iy)->update_contribution_from_nucleus_b_over_all_events(arena->get_cell(ix,iy)->get_contri_from_nucleus_b_after_gaussian_smearing()) ;
-	arena->get_cell(ix,iy)->update_contribution_from_binary_collisions_over_all_events
-                              (arena->get_cell(ix,iy)->get_contri_from_binary_collisions_after_gaussian_smearing()) ;
-    }
-  }
+  */
 }
 
 
 // relevant to generate Event-by-Event MC Glauber IC for hydro input. //
-void mc_glau_smear::reset_contribution_from_all_events_to_zero_on_the_cells(){
+void mc_glau_smear::reset_contribution_to_zero_on_the_cells(){
   for(int ix = 0 ; ix < arena->get_nx() ; ix++ ){
     for(int iy = 0 ; iy < arena->get_ny() ; iy++ ){
       arena->get_cell(ix,iy)->reset_contributions_to_zero();
@@ -185,9 +176,9 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
     for(int iy = 0 ; iy < arena->get_ny() ; iy++ ){
       double grid_x = -arena->get_xmax() + ix * arena->get_dx() ; 
       double grid_y = -arena->get_ymax() + iy * arena->get_dy() ;
-        npart_contri_of_a = arena->get_cell(ix,iy)->get_contribution_from_nucleus_a_over_all_events() ; 
-        npart_contri_of_b = arena->get_cell(ix,iy)->get_contribution_from_nucleus_b_over_all_events() ; 
-        ncoll_contri      = arena->get_cell(ix,iy)->get_contribution_from_binary_collisions_over_all_events() ; 
+        npart_contri_of_a = arena->get_cell(ix,iy)->get_contri_from_nucleus_a_after_gaussian_smearing() ; 
+        npart_contri_of_b = arena->get_cell(ix,iy)->get_contri_from_nucleus_b_after_gaussian_smearing() ; 
+        ncoll_contri      = arena->get_cell(ix,iy)->get_contri_from_binary_collisions_after_gaussian_smearing() ; 
       if((npart_contri_of_a+npart_contri_of_b) < 0.0000001 ){
 	mult              = 0.00000003 ; 
 	mult_a            = 0.00000001 ; 
@@ -233,9 +224,111 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
 
 
 
+double mc_glau_smear::get_reduced_thickness_after_gaussian_smearing() {
+  double sum = 0.;
+  double TA ;
+  double TB ; 
+  for (int iy = 0; iy < arena->get_ny(); ++iy) {
+    for (int ix = 0; ix < arena->get_nx(); ++ix) {
+      TA = arena->get_cell(ix,iy)->get_contri_from_nucleus_a_after_gaussian_smearing() ; 
+      TB = arena->get_cell(ix,iy)->get_contri_from_nucleus_a_after_gaussian_smearing() ; 
+      sum += reduced_thickness_func(TA,TB);
+    }
+  }
+  return  arena->get_dx() * arena->get_dx() * sum;
+}
 
 
+/*
+void Event::compute_observables() {
+  // Compute eccentricity.
 
+  // Simple helper class for use in the following loop.
+  struct EccentricityAccumulator {
+    double re = 0.;  // real part
+    double im = 0.;  // imaginary part
+    double wt = 0.;  // weight
+    double finish() const  // compute final eccentricity
+    { return std::sqrt(re*re + im*im) / std::fmax(wt, TINY); }
+  } e2, e3, e4, e5;
+
+  for (int iy = 0; iy < nsteps_; ++iy) {
+    for (int ix = 0; ix < nsteps_; ++ix) {
+      const auto& t = TR_[iy][ix];
+      if (t < TINY)
+        continue;
+
+      // Compute (x, y) relative to the CM and cache powers of x, y, r.
+      auto x = static_cast<double>(ix) - ixcm_;
+      auto x2 = x*x;
+      auto x3 = x2*x;
+      auto x4 = x2*x2;
+
+      auto y = static_cast<double>(iy) - iycm_;
+      auto y2 = y*y;
+      auto y3 = y2*y;
+      auto y4 = y2*y2;
+
+      auto r2 = x2 + y2;
+      auto r = std::sqrt(r2);
+      auto r4 = r2*r2;
+
+      auto xy = x*y;
+      auto x2y2 = x2*y2;
+
+      // The eccentricity harmonics are weighted averages of r^n*exp(i*n*phi)
+      // over the entropy profile (reduced thickness).  The naive way to compute
+      // exp(i*n*phi) at a given (x, y) point is essentially:
+      //
+      //   phi = arctan2(y, x)
+      //   real = cos(n*phi)
+      //   imag = sin(n*phi)
+      //
+      // However this implementation uses three unnecessary trig functions; a
+      // much faster method is to express the cos and sin directly in terms of x
+      // and y.  For example, it is trivial to show (by drawing a triangle and
+      // using rudimentary trig) that
+      //
+      //   cos(arctan2(y, x)) = x/r = x/sqrt(x^2 + y^2)
+      //   sin(arctan2(y, x)) = y/r = x/sqrt(x^2 + y^2)
+      //
+      // This is easily generalized to cos and sin of (n*phi) by invoking the
+      // multiple angle formula, e.g. sin(2x) = 2sin(x)cos(x), and hence
+      //
+      //   sin(2*arctan2(y, x)) = 2*sin(arctan2(y, x))*cos(arctan2(y, x))
+      //                        = 2*x*y / r^2
+      //
+      // Which not only eliminates the trig functions, but also naturally
+      // cancels the r^2 weight.  This cancellation occurs for all n.
+      //
+      // The Event unit test verifies that the two methods agree.
+      e2.re += t * (y2 - x2);
+      e2.im += t * 2.*xy;
+      e2.wt += t * r2;
+
+      e3.re += t * (y3 - 3.*y*x2);
+      e3.im += t * (3.*x*y2 - x3);
+      e3.wt += t * r2*r;
+
+      e4.re += t * (x4 + y4 - 6.*x2y2);
+      e4.im += t * 4.*xy*(y2 - x2);
+      e4.wt += t * r4;
+
+      e5.re += t * y*(5.*x4 - 10.*x2y2 + y4);
+      e5.im += t * x*(x4 - 10.*x2y2 + 5.*y4);
+      e5.wt += t * r4*r;
+    }
+  }
+
+  eccentricity_[2] = e2.finish();
+  eccentricity_[3] = e3.finish();
+  eccentricity_[4] = e4.finish();
+  eccentricity_[5] = e5.finish();
+}
+
+}  // namespace trento
+
+*/
 
 
 

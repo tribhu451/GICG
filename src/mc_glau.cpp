@@ -149,14 +149,12 @@ void mc_glau::shift_nucleus(double* X1, double* Y1, double* Z1,int A, double b,
 
 // this function calculates N_{part} & N_{coll}
 void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* vyB, int &Npart, 
-				    int &Ncoll, double* Npart_x, double* Npart_y, double* Ncoll_x, double* Ncoll_y)
-{
+ int &Ncoll, double* Npart_x, double* Npart_y, double* Ncoll_x, double* Ncoll_y){
   
   Ncoll                = 0 ;
   Npart                = 0 ;
   Nparticipants_from_A = 0 ; 
   Nparticipants_from_B = 0 ; 
-
 
   double weight;
   double occA[1000];
@@ -171,20 +169,20 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
     occB[i]=0;
   }
   
-  for (int i=0; i<A; i++){
-      for (int j=0; j<B; j++){  
-	double d=sqrt( pow((vxB[j]-vxA[i]),2) + 
+  for(int i=0; i<A; i++){
+    for(int j=0; j<B; j++){  
+	 double d=sqrt( pow((vxB[j]-vxA[i]),2) + 
 			      pow ( (vyB[j]-vyA[i]),2));
-	double D=sqrt( ( sigma ) / (  M_PI ) ); 
+	 double D=sqrt( ( sigma ) / (  M_PI ) ); 
 	
-	if( d <= D){ 
-	  Ncoll_x[Ncoll]=(vxA[i]+vxB[j])/2;
-	  Ncoll_y[Ncoll]=(vyA[i]+vyB[j])/2;
-	  Ncoll=Ncoll+1;
+	 if( d <= D){ 
+	   Ncoll_x[Ncoll]=(vxA[i]+vxB[j])/2;
+	   Ncoll_y[Ncoll]=(vyA[i]+vyB[j])/2;
+	   Ncoll=Ncoll+1;
 	  
-	  if(occA[i]==0){
+	   if(occA[i]==0){
 	    occA[i]=1;
-            npart_tag_A[i] = 1 ; 
+         npart_tag_A[i] = 1 ; 
 	    Npart_x[Npart]=vxA[i];
 	    Npart_y[Npart]=vyA[i];
 	    
@@ -195,11 +193,11 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
 	    npart_x_of_A[Nparticipants_from_A]=vxA[i];
 	    npart_y_of_A[Nparticipants_from_A]=vyA[i]; 
 	    npart_w_of_A[Nparticipants_from_A]=weight; 
-            Nparticipants_from_A += 1 ;
+         Nparticipants_from_A += 1 ;
 	  } 
 	  if(occB[j]==0){
 	    occB[j]=1;
-            npart_tag_B[j] = 1 ; 
+         npart_tag_B[j] = 1 ; 
 	    Npart_x[Npart]=vxB[j];
 	    Npart_y[Npart]=vyB[j];
 	    
@@ -210,60 +208,11 @@ void mc_glau::calculate_npart_ncoll(double* vxA,double* vyA,double* vxB,double* 
 	    npart_x_of_B[Nparticipants_from_B]=vxB[j];
 	    npart_y_of_B[Nparticipants_from_B]=vyB[j]; 
 	    npart_w_of_B[Nparticipants_from_B]=weight; 
-            Nparticipants_from_B += 1 ; 
-	  }
-	  
-	}                                                           
-      }                                                          
-  }        
-  
-  
-  /*                                                 
-  // [Info]  shifting the energy distributions center to (0,0,0)   
-  double xref1=0.0;
-  double yref1=0.0;
-  double wref1=0.0;
-  for(int k=0;k<Npart;k++){ 
-    xref1=xref1+(Npart_x[k]*(0.5*npp*(1-X_hard) ));
-    yref1=yref1+(Npart_y[k]*(0.5*npp*(1-X_hard)));
-    wref1=wref1+(0.5*npp*(1-X_hard));
-  }
-  
-  double xref2=0.0;
-  double yref2=0.0;
-  double wref2=0.0;
-  for(int k=0;k<Ncoll;k++){ 
-    xref2=xref2+(Ncoll_x[k]*(npp*(X_hard)));
-    yref2=yref2+(Ncoll_y[k]*(npp*(X_hard)));
-    wref2=wref2+(npp*(X_hard));
-  }
-  
-  double xAverage=((xref1+xref2)/(wref1+wref2));
-  double yAverage=((yref1+yref2)/(wref1+wref2));
-  
-  // cout<<xAverage<<"  "<<yAverage<<"\n";
-  
-  for(int k=0;k<Npart;k++){ 
-    Npart_x[k] = Npart_x[k]-xAverage;
-    Npart_y[k] = Npart_y[k]-yAverage;
-  }
-  for(int k=0;k<Ncoll;k++){ 
-    Ncoll_x[k] = Ncoll_x[k]-xAverage;
-    Ncoll_y[k] = Ncoll_y[k]-yAverage;
-  }
-  for(int k=0;k<Nparticipants_from_A;k++){ 
-    npart_x_of_A[k] = npart_x_of_A[k]-xAverage;
-    npart_y_of_A[k] = npart_y_of_A[k]-yAverage;
-  }
-  for(int k=0;k<Nparticipants_from_B;k++){ 
-    npart_x_of_B[k] = npart_x_of_B[k]-xAverage;
-    npart_y_of_B[k] = npart_y_of_B[k]-yAverage;
-  }
-  
-  shift_xavg_of_nucleons = xAverage ;   
-  shift_yavg_of_nucleons = yAverage ;   
-  */
-  
+         Nparticipants_from_B += 1 ; 
+	  } 
+      }                                                           
+     }                                                          
+   }        
 }
 
 
