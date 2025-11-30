@@ -23,6 +23,10 @@ job::~job(){
 void job::gaussian_smearing_for_ebe_mc_glauber_events(int event_no){
   std::ofstream outfile;
   std::stringstream output_filename;
+  output_filename.str("");
+  output_filename << "events_info.dat" ;
+  outfile.open(output_filename.str().c_str(), std::ios::out);
+
   double b; int npart; double multiplicity_;
   double eccentricity_[6] = {0.}; 
   int event_count = 0 ;
@@ -36,7 +40,7 @@ void job::gaussian_smearing_for_ebe_mc_glauber_events(int event_no){
      MCGlbS->get_eccentricities_after_gaussian_smearing(eccentricity_);
      
      //print
-     std::cout << event_count << "  " << b << "  " << npart << "   " << multiplicity_ << "  " 
+     outfile << event_count << "  " << b << "  " << npart << "   " << multiplicity_ << "  " 
      << eccentricity_[2] << "  " << eccentricity_[3] << "  " << eccentricity_[4] 
      << "  " << eccentricity_[5] << std::endl ;
       
@@ -48,6 +52,8 @@ void job::gaussian_smearing_for_ebe_mc_glauber_events(int event_no){
      MCGlbS->reset_contribution_to_zero_on_the_cells();
      event_count++;
   }while( event_count < event_no ) ;
+
+  outfile.close();
 }
 
 
