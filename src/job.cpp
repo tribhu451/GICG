@@ -30,6 +30,7 @@ void job::gaussian_smearing_for_ebe_mc_glauber_events(int event_no){
      MC->event();
      b = MC->get_impactf();
      npart = MC->get_npart();
+     if(npart<1){continue;}
      MCGlbS->smear_it(iparams->gaussian_smearing_sigma);
      multiplicity_ = MCGlbS->get_reduced_thickness_after_gaussian_smearing();
      MCGlbS->get_eccentricities_after_gaussian_smearing(eccentricity_);
