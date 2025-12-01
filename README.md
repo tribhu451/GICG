@@ -4,11 +4,11 @@
    Tribhuban Parida, PostDoc, AGH UST Krakow, Poland
    Email : tparida@agh.edu.pl
    strting date : 27 Nov 2025(Thursday)  version 3
-   This version is made to probe the v2-v3 fluctuation
+   This version is made to probe the ultracentral v2-v3 puzzle
    
-   The code generates 2D/3D, smooth/fluctuating 
-   initial profile using MC Glauber model which 
-   can be used in hydro codes for evolution.
+   The code generates initial profile using 
+   MC Glauber model which can be used in hydro 
+   codes for evolution.
 
    eccentricity is calculated.
 

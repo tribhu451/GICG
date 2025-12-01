@@ -236,7 +236,7 @@ double mc_glau_smear::get_reduced_thickness_after_gaussian_smearing() {
       sum += reduced_thickness_func(TA,TB);
     }
   }
-  return  arena->get_dx() * arena->get_dx() * sum;
+  return  arena->get_dx() * arena->get_dy() * sum;
 }
 
 
