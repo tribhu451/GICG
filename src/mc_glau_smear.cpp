@@ -76,7 +76,9 @@ void mc_glau_smear::smear_it(double sigma_perp){
         double grid_y = -arena->get_ymax() + iy * arena->get_dy() ;
         double prefactor_ = 1. / ( 2. * M_PI * sigma_perp_sq_ ) ; 
         double distance_sq = sqr(grid_x - contributors_x) + sqr(grid_y - contributors_y);
-        double weight_a = prefactor_ * contributors_w * exp(-.5*distance_sq/sigma_perp_sq_); 
+        //double weight_a = prefactor_ * contributors_w * exp(-.5*distance_sq/sigma_perp_sq_); 
+        // no gamma fluctuation added 
+        double weight_a = prefactor_ * exp(-.5*distance_sq/sigma_perp_sq_); 
         arena->get_cell(ix,iy)->update_contri_from_nucleus_a_after_gaussian_smearing(weight_a);
       } // iy loop
     } // ix loop
@@ -99,14 +101,16 @@ void mc_glau_smear::smear_it(double sigma_perp){
         double grid_y = -arena->get_ymax() + iy * arena->get_dy() ;
         double prefactor_ = 1. / ( 2. * M_PI * sigma_perp_sq_ ) ; 
         double distance_sq = sqr(grid_x - contributors_x) + sqr(grid_y - contributors_y);
-        double weight_b = prefactor_ * contributors_w * exp(-.5*distance_sq/sigma_perp_sq_); 
+        // double weight_b = prefactor_ * contributors_w * exp(-.5*distance_sq/sigma_perp_sq_);
+        // no gamma fluctuation added 
+        double weight_b = prefactor_ * exp(-.5*distance_sq/sigma_perp_sq_); 
         arena->get_cell(ix,iy)->update_contri_from_nucleus_b_after_gaussian_smearing(weight_b);
       } // iy loop
     } // ix loop
   } // ipart loop
 
 
-  /*
+  
   // smear the binary collison sources.
   for(int icoll=0; icoll < mc->get_ncoll() ; icoll++ ){
     double contributors_x ; 
@@ -121,12 +125,14 @@ void mc_glau_smear::smear_it(double sigma_perp){
       for(int iy = lower_index_y ; iy < upper_index_y ; iy++ ){
         double grid_x = -arena->get_xmax() + ix * arena->get_dx() ; 
         double grid_y = -arena->get_ymax() + iy * arena->get_dy() ;
-	   double weight_ncoll = 0 ; 
+        double prefactor_ = 1. / ( 2. * M_PI * sigma_perp_sq_ ) ; 
+        double distance_sq = sqr(grid_x - contributors_x) + sqr(grid_y - contributors_y);
+	double weight_ncoll = prefactor_ * exp(-.5*distance_sq/sigma_perp_sq_) ; 
         arena->get_cell(ix,iy)->update_contri_from_binary_collisions_after_gaussian_smearing(weight_ncoll);
       } // iy loop
     } // ix loop
   } // icoll loop
-  */
+  
 }
 
 
@@ -140,13 +146,14 @@ void mc_glau_smear::reset_contribution_to_zero_on_the_cells(){
 }
 
 
-// Write the event averaged profile in MUSIC format.
-void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing(int nEvents, int flag_to_generate_music_boost_invariant_file, int event_index){
+// Write the event profile in MUSIC format.
+void mc_glau_smear::write_event_profile_to_file_after_gaussian_smearing(int flag_to_generate_music_boost_invariant_file, int event_index){
   
   std::ofstream out_file;
   if(flag_to_generate_music_boost_invariant_file > 0 ){
     std::stringstream output_filename;
-    output_filename.str("");      output_filename << "output/mc_glauber_single_event_transverse_profile_for_boost_invariant_music_" << event_index ;
+    output_filename.str("");      
+    output_filename << "output/mc_glauber_single_event_transverse_profile_for_boost_invariant_music_" << event_index ;
     output_filename << ".dat";
     out_file.open(output_filename.str().c_str(), std::ios::out);
   }
@@ -158,7 +165,7 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
     out_file.open(output_filename.str().c_str(), std::ios::out);
   }
 
-  out_file <<"#"<<"\t"<<"mc_glauber"<<"\t"<<"1"<<"\t"<<"neta="<<"\t"<<"1"<<"\t"<<"nx="
+  out_file <<"#"<<"\t"<<"mc_glauber_"<<"\t"<<event_index<<"\t"<<"neta="<<"\t"<<"1"<<"\t"<<"nx="
             <<"\t"<<arena->get_nx()<<"\t"<<"ny="<<"\t"<<arena->get_ny()
 	      <<"\t"<<"deta="<<"\t"<<"0.1"<<"\t"<<"dx="<<"\t"<<arena->get_dx()<<"\t"<<"dy="<<"\t"<<arena->get_dy()<<endl;
   
@@ -172,7 +179,7 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
   double npart_contri_of_b = 0. ; 
   double ncoll_contri      = 0. ; 
 
-  double total_participants_after_event_averaging = 0 ; 
+  double total_participants_after_smearing = 0 ; 
   for(int ix = 0 ; ix < arena->get_nx() ; ix++ ){
     for(int iy = 0 ; iy < arena->get_ny() ; iy++ ){
       double grid_x = -arena->get_xmax() + ix * arena->get_dx() ; 
@@ -180,8 +187,12 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
         npart_contri_of_a = arena->get_cell(ix,iy)->get_contri_from_nucleus_a_after_gaussian_smearing() ; 
         npart_contri_of_b = arena->get_cell(ix,iy)->get_contri_from_nucleus_b_after_gaussian_smearing() ; 
         ncoll_contri      = arena->get_cell(ix,iy)->get_contri_from_binary_collisions_after_gaussian_smearing() ; 
+	mult              = reduced_thickness_func(npart_contri_of_a,npart_contri_of_b) ; 
+	mult_a            = npart_contri_of_a / (npart_contri_of_a + npart_contri_of_b) * reduced_thickness_func(npart_contri_of_a,npart_contri_of_b) ; 
+	mult_b            = npart_contri_of_b / (npart_contri_of_a + npart_contri_of_b) * reduced_thickness_func(npart_contri_of_a,npart_contri_of_b) ; 
+        mult_coll         = 0. ; 
       if((npart_contri_of_a+npart_contri_of_b) < 0.0000001 ){
-	mult              = 0.00000003 ; 
+	mult              = 0.00000001 ; 
 	mult_a            = 0.00000001 ; 
 	mult_b            = 0.00000001 ; 
 	mult_coll         = 0.00000001 ; 
@@ -190,14 +201,7 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
         ncoll_contri      = 0.00000001 ;  
       }
 
-      mult               /=  nEvents ; 
-      mult_a             /=  nEvents ; 
-      mult_b             /=  nEvents ; 
-      mult_coll          /=  nEvents ; 
-      npart_contri_of_a  /=  nEvents ; 
-      npart_contri_of_b  /=  nEvents ; 
-      ncoll_contri       /=  nEvents ; 
-      total_participants_after_event_averaging += (npart_contri_of_a + npart_contri_of_b) ; 
+      total_participants_after_smearing += (npart_contri_of_a + npart_contri_of_b) ; 
 
       participant_sum  += (mult_a + mult_b) ;
       participant_diff += (mult_a - mult_b) ;  
@@ -218,7 +222,7 @@ void mc_glau_smear::write_event_averaged_profile_to_file_after_gaussian_smearing
   } // ix loop
 
   // double ybeam = acosh(inparams->SNN / ( 2. * 0.938 ) ) ; 
-  std::cout << "total participant after event averaging = " << total_participants_after_event_averaging << std::endl ; 
+  std::cout << "total participant after smearing = " << total_participants_after_smearing * (arena->get_dx()*arena->get_dy())  << std::endl ; 
   std::cout << "participant assymetry : " << ( participant_diff / participant_sum )  * 100 << " %" << std::endl ; 
 
 }

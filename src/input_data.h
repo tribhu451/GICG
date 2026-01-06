@@ -9,7 +9,8 @@ typedef struct input_data
 {
 
   int mode ;  
-
+  int write_profile;
+ 
   double SNN;
   string projectile;
   string target;  

@@ -22,6 +22,7 @@ public :
 // This functions reads the input.dat file and sets the input parameters in the code 
 void read_input_data_(InputData *input_parameter_list, string input_file_name)
 {
+
   string a_; char a[50];
   
   istringstream* iss;
@@ -40,7 +41,7 @@ void read_input_data_(InputData *input_parameter_list, string input_file_name)
       *iss >> a_ >> a ;
  
       if(a_ == "mode" )    {input_parameter_list->mode = atof(a);}
-
+      if(a_ == "write_profile" )  {input_parameter_list->write_profile = atof(a);}
       if(a_ == "projectile" )    {input_parameter_list->projectile = a;}
       if(a_ == "target" )    {input_parameter_list->target = a;}
       if(a_ == "SNN" )    {input_parameter_list->SNN = atof(a);}

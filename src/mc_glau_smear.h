@@ -13,7 +13,7 @@ class mc_glau_smear {
     mc_glau_smear(InputData *inparams_,grid* arena_, mc_glau* _mc);
     ~mc_glau_smear();
     void smear_it(double );
-    void write_event_averaged_profile_to_file_after_gaussian_smearing(int nEvents, int flag_to_generate_music_boost_invariant_file, int event_index);
+    void write_event_profile_to_file_after_gaussian_smearing(int flag_to_generate_music_boost_invariant_file, int event_index);
     void reset_contribution_to_zero_on_the_cells();
     double get_reduced_thickness_after_gaussian_smearing();
     void get_eccentricities_after_gaussian_smearing(double* eccentricity_);

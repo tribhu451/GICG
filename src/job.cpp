@@ -27,27 +27,35 @@ void job::gaussian_smearing_for_ebe_mc_glauber_events(int event_no){
   output_filename << "events_info.dat" ;
   outfile.open(output_filename.str().c_str(), std::ios::out);
 
-  double b; int npart; double multiplicity_;
+  double b; int npart; double multiplicity_; int ncoll;
   double eccentricity_[6] = {0.}; 
   int event_count = 0 ;
   do{
      MC->event();
      b = MC->get_impactf();
      npart = MC->get_npart();
+     ncoll = MC->get_ncoll();
      if(npart<1){continue;}
      MCGlbS->smear_it(iparams->gaussian_smearing_sigma);
      multiplicity_ = MCGlbS->get_reduced_thickness_after_gaussian_smearing();
      MCGlbS->get_eccentricities_after_gaussian_smearing(eccentricity_);
      
      //print
-     outfile << event_count << "  " << b << "  " << npart << "   " << multiplicity_ << "  " 
-     << eccentricity_[2] << "  " << eccentricity_[3] << "  " << eccentricity_[4] 
-     << "  " << eccentricity_[5] << std::endl ;
-      
+     outfile << event_count << "  " << b << "  " << npart << "   " << ncoll 
+     << "  " << multiplicity_ << "  " << eccentricity_[2] << "  " << eccentricity_[3] 
+     << "  " << eccentricity_[4] << "  " << eccentricity_[5] << std::endl ;
+
+     std::cout << event_count << "  " << b << "  " << npart << "   " << ncoll 
+     << "  " << multiplicity_ << "  " << eccentricity_[2] << "  " << eccentricity_[3] 
+     << "  " << eccentricity_[4] << "  " << eccentricity_[5] << std::endl ;
+
      // write to files
-     //MCGlbS->write_event_averaged_profile_to_file_after_gaussian_smearing(1,1,event_count);
-     //MCGlbS->write_event_averaged_profile_to_file_after_gaussian_smearing(1,0,event_count);
-     
+     if(iparams->write_profile == 1){
+       MCGlbS->write_event_profile_to_file_after_gaussian_smearing(1,event_count);
+       MCGlbS->write_event_profile_to_file_after_gaussian_smearing(0,event_count);
+       std::cout << " " << std::endl ; 
+     }
+
      // reset everything and cleanup for next event
      MCGlbS->reset_contribution_to_zero_on_the_cells();
      event_count++;

@@ -13,7 +13,5 @@ void cell::reset_contributions_to_zero(){
 }
 
 
-
-
 cell::~cell(){
 }
